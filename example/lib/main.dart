@@ -69,7 +69,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             RaisedButton(
               onPressed: () async {
-                await GetIt.I<InteractionManager>().showRegisteredDialog<Map<String,String>,void>(
+                await GetIt.I<InteractionManager>()
+                    .showRegisteredDialog<Map<String, String>, void>(
                   dialogName: 'MessageDialog',
                   data: {
                     'title': 'This is the Title',
@@ -95,11 +96,25 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             RaisedButton(
               onPressed: () async {
-                await GetIt.I<InteractionManager>().showNetworkConfigurationDialog(
-                    title: 'Network Dialog',
-                    message: 'This is a message!',
-                    okButtonText: 'OK',
-                    );
+                var result =
+                    await GetIt.I<InteractionManager>().showQueryDialog(
+                  title: 'Query Dialog',
+                  message: 'This is a query dialog!',
+                );
+                print(result);
+              },
+              child: Text(
+                'Query Dialog:',
+              ),
+            ),
+            RaisedButton(
+              onPressed: () async {
+                await GetIt.I<InteractionManager>()
+                    .showNetworkConfigurationDialog(
+                  title: 'Network Dialog',
+                  message: 'This is a message!',
+                  okButtonText: 'OK',
+                );
               },
               child: Text(
                 'Network Dialog:',

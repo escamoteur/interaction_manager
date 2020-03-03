@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NetworkConfiguration {
@@ -76,61 +79,74 @@ class _NetWorkConfigurationWidgetState
   @override
   Widget build(BuildContext context) {
     final dlgConfig = widget.dialogConfig;
-    return AlertDialog(
-      title: Text(dlgConfig.title ?? ''),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            if (dlgConfig.message != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: Text(dlgConfig.message),
-              ),
-            Text(dlgConfig.serverAdressLabel),
-            TextField(
-              keyboardType: TextInputType.url,
-              controller: ipController,
-              onChanged: (s) => serverAddress = s,
+    var content = SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          if (dlgConfig.message != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: Text(dlgConfig.message),
             ),
-            const SizedBox(height: 16.0),
-            Text(dlgConfig.portLabel),
-            TextField(
-              keyboardType: const TextInputType.numberWithOptions(),
-              controller: portController,
-              onChanged: (portAsString) {
-                port = int.tryParse(portAsString);
-                if (port == null) {
-                  setState(() {
-                    portErrorText = dlgConfig.portFormatErrorMessage;
-                  });
-                } else {
-                  setState(() {
-                    portErrorText = null;
-                  });
-                }
-              },
-              decoration: InputDecoration(errorText: portErrorText),
-            ),
-            if (dlgConfig.showProtocolSelection)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Row(
-                  children: [
-                    Text(dlgConfig.sslLabel),
-                    Checkbox(
-                      value: useSSL,
-                      onChanged: (b) => useSSL = b,
-                    ),
-                  ],
-                ),
+          Text(dlgConfig.serverAdressLabel),
+          TextField(
+            keyboardType: TextInputType.url,
+            controller: ipController,
+            onChanged: (s) => serverAddress = s,
+          ),
+          const SizedBox(height: 16.0),
+          Text(dlgConfig.portLabel),
+          TextField(
+            keyboardType: const TextInputType.numberWithOptions(),
+            controller: portController,
+            onChanged: (portAsString) {
+              port = int.tryParse(portAsString);
+              if (port == null) {
+                setState(() {
+                  portErrorText = dlgConfig.portFormatErrorMessage;
+                });
+              } else {
+                setState(() {
+                  portErrorText = null;
+                });
+              }
+            },
+            decoration: InputDecoration(errorText: portErrorText),
+          ),
+          if (dlgConfig.showProtocolSelection)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Row(
+                children: [
+                  Text(dlgConfig.sslLabel),
+                  Checkbox(
+                    value: useSSL,
+                    onChanged: (b) => useSSL = b,
+                  ),
+                ],
               ),
-          ],
-        ),
+            ),
+        ],
       ),
-      actions: <Widget>[
-        if (dlgConfig.cancelButtonText != null)
+    );
+    if (Platform.isIOS) {
+      return CupertinoAlertDialog(
+        title: Text(dlgConfig.title ?? ''),
+        content: content,
+        actions: <Widget>[
+          if (dlgConfig.cancelButtonText != null)
+            FlatButton(
+              onPressed: () {
+                final netWorkConfig = NetworkConfiguration(
+                    port: port,
+                    serverAdress: serverAddress.trim(),
+                    useSSL: useSSL);
+
+                Navigator.of(context).pop(netWorkConfig);
+              },
+              child: Text(dlgConfig.cancelButtonText),
+            ),
           FlatButton(
             onPressed: () {
               final netWorkConfig = NetworkConfiguration(
@@ -140,18 +156,35 @@ class _NetWorkConfigurationWidgetState
 
               Navigator.of(context).pop(netWorkConfig);
             },
-            child: Text(dlgConfig.cancelButtonText),
+            child: Text(dlgConfig.okButtonText),
           ),
-        FlatButton(
-          onPressed: () {
-            final netWorkConfig = NetworkConfiguration(
-                port: port, serverAdress: serverAddress.trim(), useSSL: useSSL);
+        ],
+      );
+    } else {
+      return AlertDialog(
+        title: Text(dlgConfig.title ?? ''),
+        content: content,
+        actions: <Widget>[
+          if (dlgConfig.cancelButtonText != null)
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop(null);
+              },
+              child: Text(dlgConfig.cancelButtonText),
+            ),
+          FlatButton(
+            onPressed: () {
+              final netWorkConfig = NetworkConfiguration(
+                  port: port,
+                  serverAdress: serverAddress.trim(),
+                  useSSL: useSSL);
 
-            Navigator.of(context).pop(netWorkConfig);
-          },
-          child: Text(dlgConfig.okButtonText),
-        ),
-      ],
-    );
+              Navigator.of(context).pop(netWorkConfig);
+            },
+            child: Text(dlgConfig.okButtonText),
+          ),
+        ],
+      );
+    }
   }
 }

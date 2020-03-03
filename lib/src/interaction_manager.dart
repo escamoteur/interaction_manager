@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
-import 'package:interaction_manager/interaction_manager.dart';
 import 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 import 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
 
@@ -60,7 +59,6 @@ class InteractionManager {
           'There is already a dialog with name: "$dialogName" registered'));
     }
     _dialogRegistry[dialogName] = DialogRegistration<DialogDataType>(builder);
-
   }
 
   Future<ResultType> showRegisteredDialog<DialogDataType, ResultType>(
@@ -72,7 +70,8 @@ class InteractionManager {
           'There is no dialog with that name: "$dialogName" registered'));
     }
 
-    final dialogRegistry = _dialogRegistry[dialogName] as DialogRegistration<DialogDataType>;
+    final dialogRegistry =
+        _dialogRegistry[dialogName] as DialogRegistration<DialogDataType>;
     return showCustomDialog<DialogDataType, ResultType>(
         dialogBuilder: dialogRegistry.builderFunc,
         data: data,
@@ -82,15 +81,36 @@ class InteractionManager {
   Future showMessageDialog({
     String title,
     String message,
-    String closeButtonText = 'Ok',
+    String closeButtonText = 'OK',
+    bool barrierDismissible = false,
   }) async {
-    return await showRegisteredDialog<Map<String, String>, void>(
+    return await showRegisteredDialog<MessageDialogConfig, void>(
         dialogName: MessageDialog.dialogId,
-        data: {
-          MessageDialog.fieldTitle: title,
-          MessageDialog.fieldMessage: message,
-          MessageDialog.fieldCloseButtonText: closeButtonText
-        });
+        data: MessageDialogConfig(
+            message: message,
+            title: title,
+            buttonDefinitions: {MessageDialogResults.ok: closeButtonText}),
+        barrierDismissible: barrierDismissible);
+  }
+
+  Future<MessageDialogResults> showQueryDialog({
+    String title,
+    String message,
+    Map<MessageDialogResults, String> buttonDefinitions = const {
+      MessageDialogResults.yes: 'Yes',
+      MessageDialogResults.no: 'No',
+      MessageDialogResults.cancel: 'Cancel',
+    },
+    bool barrierDismissible = false,
+  }) async {
+    return await showRegisteredDialog<MessageDialogConfig,
+            MessageDialogResults>(
+        dialogName: MessageDialog.dialogId,
+        data: MessageDialogConfig(
+            message: message,
+            title: title,
+            buttonDefinitions: buttonDefinitions),
+        barrierDismissible: barrierDismissible);
   }
 
   Future<NetworkConfiguration> showNetworkConfigurationDialog({
@@ -104,10 +124,12 @@ class InteractionManager {
     String okButtonText = 'Ok',
     String cancelButtonText,
     NetworkConfiguration netWorkConfiguration = const NetworkConfiguration(),
+    bool barrierDismissible = false,
   }) async {
     return await showRegisteredDialog<NetworkConfigurationDialogConfig,
             NetworkConfiguration>(
         dialogName: NetworkConfigurationDialog.dialogId,
+        barrierDismissible: barrierDismissible,
         data: NetworkConfigurationDialogConfig(
             title: title,
             message: message,
@@ -122,7 +144,7 @@ class InteractionManager {
   }
 
   void _registerStandardDialog() {
-    registerCustomDialog<Map<String, String>>(
+    registerCustomDialog<MessageDialogConfig>(
         MessageDialog.build, MessageDialog.dialogId);
     registerCustomDialog<NetworkConfigurationDialogConfig>(
         NetworkConfigurationDialog.build, NetworkConfigurationDialog.dialogId);
