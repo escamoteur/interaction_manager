@@ -86,8 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
             RaisedButton(
               onPressed: () async {
                 await GetIt.I<InteractionManager>().showMessageDialog(
+                    'This is a message!',
                     title: 'Message Dialog',
-                    message: 'This is a message!',
                     closeButtonText: 'OK');
               },
               child: Text(
@@ -98,8 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () async {
                 var result =
                     await GetIt.I<InteractionManager>().showQueryDialog(
+                  'This is a query dialog!',
                   title: 'Query Dialog',
-                  message: 'This is a query dialog!',
                 );
                 print(result);
               },

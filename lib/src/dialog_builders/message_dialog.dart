@@ -20,37 +20,41 @@ class MessageDialog {
         'You have to provide at least one button definition');
 
     return WillPopScope(
-          onWillPop: () async {
-            Navigator.of(context).pop(MessageDialogResults.cancel);
-            return true;
-          },
-          child: !Platform.isIOS ? AlertDialog(
-        title: Text(dialogConfig.title ?? ''),
-        content: Text(dialogConfig.message ?? ''),
-        actions: [
-          for(final buttonDefinition in dialogConfig.buttonDefinitions.entries)
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop<MessageDialogResults>(buttonDefinition.key);
-              },
-              child: Text(buttonDefinition.value),
+      onWillPop: () async {
+        Navigator.of(context).pop(MessageDialogResults.cancel);
+        return true;
+      },
+      child: !Platform.isIOS
+          ? AlertDialog(
+              title: Text(dialogConfig.title ?? ''),
+              content: Text(dialogConfig.message ?? ''),
+              actions: [
+                for (final buttonDefinition
+                    in dialogConfig.buttonDefinitions.entries)
+                  FlatButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pop<MessageDialogResults>(buttonDefinition.key);
+                    },
+                    child: Text(buttonDefinition.value),
+                  ),
+              ],
+            )
+          : CupertinoAlertDialog(
+              title: Text(dialogConfig.title ?? ''),
+              content: Text(dialogConfig.message ?? ''),
+              actions: [
+                for (final buttonDefinition
+                    in dialogConfig.buttonDefinitions.entries)
+                  FlatButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pop<MessageDialogResults>(buttonDefinition.key);
+                    },
+                    child: Text(buttonDefinition.value),
+                  ),
+              ],
             ),
-        ],
-      ) :
-      CupertinoAlertDialog(
-        title: Text(dialogConfig.title ?? ''),
-        content: Text(dialogConfig.message ?? ''),
-        actions: [
-          for(final buttonDefinition in dialogConfig.buttonDefinitions.entries)
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop<MessageDialogResults>(buttonDefinition.key);
-              },
-              child: Text(buttonDefinition.value),
-            ),
-        ],
-      )
-      ,
     );
   }
 }

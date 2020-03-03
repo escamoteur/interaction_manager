@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 import 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
+export 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
 
 typedef DialogBuilderFunc<T> = Widget Function(BuildContext, T);
 
@@ -17,6 +18,10 @@ class InteractionManager {
   bool allowReasigningDialogs = false;
 
   void setContext(BuildContext context) => _referenceContext = context;
+
+  Future<T> navigateTo<T>(String routeName) {
+    return Navigator.of(_referenceContext).pushNamed<T>(routeName);
+  }
 
   void closeDialog<TResult>([TResult result]) {
     if (_numOpenDialogs > 0) {
@@ -78,9 +83,9 @@ class InteractionManager {
         barrierDismissible: barrierDismissible);
   }
 
-  Future showMessageDialog({
+  Future showMessageDialog(
+    String message, {
     String title,
-    String message,
     String closeButtonText = 'OK',
     bool barrierDismissible = false,
   }) async {
@@ -93,9 +98,9 @@ class InteractionManager {
         barrierDismissible: barrierDismissible);
   }
 
-  Future<MessageDialogResults> showQueryDialog({
+  Future<MessageDialogResults> showQueryDialog(
+    String message, {
     String title,
-    String message,
     Map<MessageDialogResults, String> buttonDefinitions = const {
       MessageDialogResults.yes: 'Yes',
       MessageDialogResults.no: 'No',
@@ -123,7 +128,7 @@ class InteractionManager {
     String portFormatErrorMessage = 'Only Numbers',
     String okButtonText = 'Ok',
     String cancelButtonText,
-    NetworkConfiguration netWorkConfiguration = const NetworkConfiguration(),
+    NetworkConfiguration networkConfiguration = const NetworkConfiguration(),
     bool barrierDismissible = false,
   }) async {
     return await showRegisteredDialog<NetworkConfigurationDialogConfig,
@@ -140,7 +145,7 @@ class InteractionManager {
             showProtocolSelection: showProtocolSelection,
             sslLabel: sslLabel,
             serverAdressLabel: serverAdressLabel,
-            netWorkConfiguration: netWorkConfiguration));
+            netWorkConfiguration: networkConfiguration));
   }
 
   void _registerStandardDialog() {
