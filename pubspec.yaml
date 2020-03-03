@@ -1,14 +1,14 @@
 name: interaction_manager
 description: A new Flutter package project.
-version: 0.0.1
+version: 0.0.2
 author:
-homepage:
+homepage: https://github.com/escamoteur/interaction_manager
 
 environment:
   sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
-  get_it: 4.0.0-release-candidate
+  get_it: ^4.0.0
   flutter:
     sdk: flutter
 

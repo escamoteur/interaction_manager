@@ -11,8 +11,8 @@ typedef DialogBuilderFunc<T> = Widget Function(BuildContext, T);
 class InteractionManager {
   BuildContext _referenceContext;
   int _numOpenDialogs = 0;
-  Map<String, DialogRegistration<Object>> _dialogRegistry =
-      <String, DialogRegistration>{};
+  Map<String, _DialogRegistration<Object>> _dialogRegistry =
+      <String, _DialogRegistration>{};
 
   bool allowReasigningDialogs = false;
 
@@ -58,7 +58,7 @@ class InteractionManager {
       throw (StateError(
           'There is already a dialog with name: "$dialogName" registered'));
     }
-    _dialogRegistry[dialogName] = DialogRegistration<DialogDataType>(builder);
+    _dialogRegistry[dialogName] = _DialogRegistration<DialogDataType>(builder);
   }
 
   Future<ResultType> showRegisteredDialog<DialogDataType, ResultType>(
@@ -71,7 +71,7 @@ class InteractionManager {
     }
 
     final dialogRegistry =
-        _dialogRegistry[dialogName] as DialogRegistration<DialogDataType>;
+        _dialogRegistry[dialogName] as _DialogRegistration<DialogDataType>;
     return showCustomDialog<DialogDataType, ResultType>(
         dialogBuilder: dialogRegistry.builderFunc,
         data: data,
@@ -151,10 +151,10 @@ class InteractionManager {
   }
 }
 
-class DialogRegistration<T> {
+class _DialogRegistration<T> {
   final DialogBuilderFunc<T> builderFunc;
 
-  DialogRegistration(this.builderFunc);
+  _DialogRegistration(this.builderFunc);
 }
 
 class InteractionConnector extends StatefulWidget {
