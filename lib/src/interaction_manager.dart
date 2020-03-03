@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
+import 'package:interaction_manager/interaction_manager.dart';
 import 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 import 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
 
@@ -11,7 +12,7 @@ typedef DialogBuilderFunc<T> = Widget Function(BuildContext, T);
 class InteractionManager {
   BuildContext _referenceContext;
   int _numOpenDialogs = 0;
-  Map<String, DialogRegistration> _dialogRegistry =
+  Map<String, DialogRegistration<Object>> _dialogRegistry =
       <String, DialogRegistration>{};
 
   bool allowReasigningDialogs = false;
@@ -59,6 +60,7 @@ class InteractionManager {
           'There is already a dialog with name: "$dialogName" registered'));
     }
     _dialogRegistry[dialogName] = DialogRegistration<DialogDataType>(builder);
+
   }
 
   Future<ResultType> showRegisteredDialog<DialogDataType, ResultType>(
@@ -69,11 +71,10 @@ class InteractionManager {
       throw (StateError(
           'There is no dialog with that name: "$dialogName" registered'));
     }
-    var dialogRegistry = _dialogRegistry[dialogName];
-    var builderFunc2 = dialogRegistry.builderFunc;
-    print(builderFunc2);
+
+    final dialogRegistry = _dialogRegistry[dialogName] as DialogRegistration<DialogDataType>;
     return showCustomDialog<DialogDataType, ResultType>(
-        dialogBuilder: builderFunc2,
+        dialogBuilder: dialogRegistry.builderFunc,
         data: data,
         barrierDismissible: barrierDismissible);
   }
@@ -97,10 +98,12 @@ class InteractionManager {
     String message,
     String serverAdressLabel = 'Server Address',
     String portLabel = 'Server Port',
+    String sslLabel = 'Use SSL',
     bool showProtocolSelection = true,
     String portFormatErrorMessage = 'Only Numbers',
-    String closeButtonText = 'Ok',
-    NetworkConfiguration netWorkConfiguration,
+    String okButtonText = 'Ok',
+    String cancelButtonText,
+    NetworkConfiguration netWorkConfiguration = const NetworkConfiguration(),
   }) async {
     return await showRegisteredDialog<NetworkConfigurationDialogConfig,
             NetworkConfiguration>(
@@ -109,15 +112,17 @@ class InteractionManager {
             title: title,
             message: message,
             portLabel: portLabel,
-            buttonText: closeButtonText,
+            okButtonText: okButtonText,
+            cancelButtonText: cancelButtonText,
             portFormatErrorMessage: portFormatErrorMessage,
             showProtocolSelection: showProtocolSelection,
+            sslLabel: sslLabel,
             serverAdressLabel: serverAdressLabel,
             netWorkConfiguration: netWorkConfiguration));
   }
 
   void _registerStandardDialog() {
-    registerCustomDialog<Map<String, dynamic>>(
+    registerCustomDialog<Map<String, String>>(
         MessageDialog.build, MessageDialog.dialogId);
     registerCustomDialog<NetworkConfigurationDialogConfig>(
         NetworkConfigurationDialog.build, NetworkConfigurationDialog.dialogId);

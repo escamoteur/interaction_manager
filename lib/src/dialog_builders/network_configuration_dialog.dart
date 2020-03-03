@@ -5,7 +5,7 @@ class NetworkConfiguration {
   final String serverAdress;
   final int port;
 
-  NetworkConfiguration({this.useSSL, this.serverAdress, this.port});
+  const NetworkConfiguration({this.useSSL, this.serverAdress, this.port});
 }
 
 class NetworkConfigurationDialogConfig {
@@ -13,26 +13,34 @@ class NetworkConfigurationDialogConfig {
   final String message;
   final String serverAdressLabel;
   final String portLabel;
+  final String sslLabel;
   final bool showProtocolSelection;
   final String portFormatErrorMessage;
-  final String buttonText;
+  final String okButtonText;
+  final String cancelButtonText;
   final NetworkConfiguration netWorkConfiguration;
 
   NetworkConfigurationDialogConfig({
     this.portFormatErrorMessage,
-    this.buttonText,
+    this.okButtonText,
+    this.cancelButtonText,
     this.title,
     this.message,
     this.serverAdressLabel,
-    this.portLabel ,
+    this.portLabel,
+    this.sslLabel,
     this.showProtocolSelection,
     this.netWorkConfiguration,
   });
 }
 
 class NetworkConfigurationDialog {
-  static const String dialogId = 'NetWorkConfiguration'; 
-  static Widget build(BuildContext context,NetworkConfigurationDialogConfig config) => _NetWorkConfigurationWidget(dialogConfig: config,);
+  static const String dialogId = 'NetWorkConfiguration';
+  static Widget build(
+          BuildContext context, NetworkConfigurationDialogConfig config) =>
+      _NetWorkConfigurationWidget(
+        dialogConfig: config,
+      );
 }
 
 class _NetWorkConfigurationWidget extends StatefulWidget {
@@ -41,10 +49,12 @@ class _NetWorkConfigurationWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  _NetWorkConfigurationWidgetState createState() => _NetWorkConfigurationWidgetState();
+  _NetWorkConfigurationWidgetState createState() =>
+      _NetWorkConfigurationWidgetState();
 }
 
-class _NetWorkConfigurationWidgetState extends State<_NetWorkConfigurationWidget> {
+class _NetWorkConfigurationWidgetState
+    extends State<_NetWorkConfigurationWidget> {
   TextEditingController ipController;
   TextEditingController portController;
 
@@ -73,6 +83,11 @@ class _NetWorkConfigurationWidgetState extends State<_NetWorkConfigurationWidget
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            if (dlgConfig.message != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Text(dlgConfig.message),
+              ),
             Text(dlgConfig.serverAdressLabel),
             TextField(
               keyboardType: TextInputType.url,
@@ -88,7 +103,7 @@ class _NetWorkConfigurationWidgetState extends State<_NetWorkConfigurationWidget
                 port = int.tryParse(portAsString);
                 if (port == null) {
                   setState(() {
-                    portErrorText = 'Only Numbers';
+                    portErrorText = dlgConfig.portFormatErrorMessage;
                   });
                 } else {
                   setState(() {
@@ -98,20 +113,43 @@ class _NetWorkConfigurationWidgetState extends State<_NetWorkConfigurationWidget
               },
               decoration: InputDecoration(errorText: portErrorText),
             ),
+            if (dlgConfig.showProtocolSelection)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  children: [
+                    Text(dlgConfig.sslLabel),
+                    Checkbox(
+                      value: useSSL,
+                      onChanged: (b) => useSSL = b,
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
       actions: <Widget>[
+        if (dlgConfig.cancelButtonText != null)
+          FlatButton(
+            onPressed: () {
+              final netWorkConfig = NetworkConfiguration(
+                  port: port,
+                  serverAdress: serverAddress.trim(),
+                  useSSL: useSSL);
+
+              Navigator.of(context).pop(netWorkConfig);
+            },
+            child: Text(dlgConfig.cancelButtonText),
+          ),
         FlatButton(
           onPressed: () {
             final netWorkConfig = NetworkConfiguration(
-                port: port,
-                serverAdress: serverAddress.trim(),
-                useSSL: useSSL);
+                port: port, serverAdress: serverAddress.trim(), useSSL: useSSL);
 
             Navigator.of(context).pop(netWorkConfig);
           },
-          child: Text(dlgConfig.buttonText),
+          child: Text(dlgConfig.okButtonText),
         ),
       ],
     );

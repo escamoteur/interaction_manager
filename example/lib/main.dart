@@ -69,11 +69,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             RaisedButton(
               onPressed: () async {
-                await GetIt.I<InteractionManager>().showRegisteredDialog(
+                await GetIt.I<InteractionManager>().showRegisteredDialog<Map<String,String>,void>(
                   dialogName: 'MessageDialog',
                   data: {
                     'title': 'This is the Title',
-                    'message': 'Direct Display',
+                    'message': 'Registered Dialog',
                     'buttonText': 'OK'
                   },
                 );
@@ -98,7 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 await GetIt.I<InteractionManager>().showNetworkConfigurationDialog(
                     title: 'Network Dialog',
                     message: 'This is a message!',
-                    closeButtonText: 'OK');
+                    okButtonText: 'OK',
+                    );
               },
               child: Text(
                 'Network Dialog:',

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+
 class MessageDialog
 {
   static const dialogId = 'Message';
@@ -7,7 +9,7 @@ class MessageDialog
   static const fieldMessage = 'message';
   static const fieldCloseButtonText = 'closeButtonText';
 
-  static Widget build(BuildContext context, data) => AlertDialog(
+  static Widget build(BuildContext context, Map<String,dynamic> data) => AlertDialog(
                         title: Text(data[fieldTitle]),
                         content: Text(data[fieldMessage]),
                         actions: [
