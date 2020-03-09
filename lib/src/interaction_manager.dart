@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 import 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
+
+export 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 export 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
 
 typedef DialogBuilderFunc<T> = Widget Function(BuildContext, T);
