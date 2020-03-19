@@ -12,22 +12,28 @@ export 'package:interaction_manager/src/dialog_builders/network_configuration_di
 typedef DialogBuilderFunc<T> = Widget Function(BuildContext, T);
 
 class InteractionManager {
-  BuildContext _referenceContext;
+  NavigatorState _rootNavigatorState;
   int _numOpenDialogs = 0;
   Map<String, _DialogRegistration<Object>> _dialogRegistry =
       <String, _DialogRegistration>{};
 
   bool allowReasigningDialogs = false;
 
-  void setContext(BuildContext context) => _referenceContext = context;
+  void setRootNavigator(NavigatorState navigatorState) => _rootNavigatorState = navigatorState;
 
   Future<T> navigateTo<T>(String routeName) {
-    return Navigator.of(_referenceContext).pushNamed<T>(routeName);
+    BuildContext childContext;
+    _rootNavigatorState.context.visitChildElements((element) => childContext = element);
+
+    return Navigator.of(childContext).pushNamed<T>(routeName);
   }
 
   void closeDialog<TResult>([TResult result]) {
     if (_numOpenDialogs > 0) {
-      Navigator.of(_referenceContext).pop<TResult>(result);
+          BuildContext childContext;
+    _rootNavigatorState.context.visitChildElements((element) => childContext = element);
+
+      Navigator.of(childContext).pop<TResult>(result);
     }
   }
 
@@ -37,21 +43,24 @@ class InteractionManager {
       bool barrierDismissible = false}) async {
     ResultType result;
     _numOpenDialogs++;
+        BuildContext childContext;
+    _rootNavigatorState.context.visitChildElements((element) => childContext = element);
+
     if (Platform.isAndroid) {
       result = await showDialog<ResultType>(
-          context: _referenceContext,
+          context: childContext,
           barrierDismissible: barrierDismissible,
           builder: (context) => dialogBuilder(context, data));
     } else if (Platform.isIOS) {
       result = await showCupertinoDialog<ResultType>(
-          context: _referenceContext,
+          context: childContext,
           builder: (context) => dialogBuilder(context, data));
     }
 
     /// todo add other platforms
     else {
       result = await showDialog<ResultType>(
-          context: _referenceContext,
+          context: childContext,
           barrierDismissible: barrierDismissible,
           builder: (context) => dialogBuilder(context, data));
     }
@@ -198,7 +207,7 @@ class _InteractionConnectorState extends State<InteractionConnector> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    GetIt.I<InteractionManager>().setContext(context);
+    GetIt.I<InteractionManager>().setRootNavigator(Navigator.of(context,rootNavigator: true));
   }
 
   @override

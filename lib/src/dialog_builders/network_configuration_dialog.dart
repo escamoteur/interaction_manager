@@ -122,7 +122,7 @@ class _NetWorkConfigurationWidgetState
                   Text(dlgConfig.sslLabel),
                   Checkbox(
                     value: useSSL,
-                    onChanged: (b) => useSSL = b,
+                    onChanged: (b) => setState(() =>useSSL = b),
                   ),
                 ],
               ),
