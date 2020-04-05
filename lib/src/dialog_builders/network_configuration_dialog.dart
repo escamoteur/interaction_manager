@@ -41,23 +41,23 @@ class NetworkConfigurationDialog {
   static const String dialogId = 'NetWorkConfiguration';
   static Widget build(
           BuildContext context, NetworkConfigurationDialogConfig config) =>
-      _NetWorkConfigurationWidget(
+      NetWorkConfigurationWidget(
         dialogConfig: config,
       );
 }
 
-class _NetWorkConfigurationWidget extends StatefulWidget {
+class NetWorkConfigurationWidget extends StatefulWidget {
   final NetworkConfigurationDialogConfig dialogConfig;
-  const _NetWorkConfigurationWidget({Key key, this.dialogConfig})
+  const NetWorkConfigurationWidget({Key key, this.dialogConfig})
       : super(key: key);
 
   @override
-  _NetWorkConfigurationWidgetState createState() =>
-      _NetWorkConfigurationWidgetState();
+  NetWorkConfigurationWidgetState createState() =>
+      NetWorkConfigurationWidgetState();
 }
 
-class _NetWorkConfigurationWidgetState
-    extends State<_NetWorkConfigurationWidget> {
+class NetWorkConfigurationWidgetState
+    extends State<NetWorkConfigurationWidget> {
   TextEditingController ipController;
   TextEditingController portController;
 
@@ -138,12 +138,7 @@ class _NetWorkConfigurationWidgetState
           if (dlgConfig.cancelButtonText != null)
             FlatButton(
               onPressed: () {
-                final netWorkConfig = NetworkConfiguration(
-                    port: port,
-                    serverAdress: serverAddress.trim(),
-                    useSSL: useSSL);
-
-                Navigator.of(context).pop(netWorkConfig);
+                Navigator.of(context).pop(null);
               },
               child: Text(dlgConfig.cancelButtonText),
             ),

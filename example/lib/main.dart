@@ -120,6 +120,52 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Network Dialog:',
               ),
             ),
+            RaisedButton(
+              onPressed: () async {
+                var result = await GetIt.I<InteractionManager>().showFormDialog(
+                    title: 'Form Dialog',
+                    header: 'Please enter all Fields',
+                    footer: 'This Process takes a little time',
+                    onValidationError: () async =>
+                        await GetIt.I<InteractionManager>().showMessageDialog(
+                            'There are invalid values in your Form'),
+                    fields: [
+                      FormFieldConfig<String>(
+                        tag: 'name', 
+                        label: 'Name',
+                        validator: (s) => s.isEmpty ? 'You have to fill out this field' : null
+                      ),
+                      FormFieldConfig<String>(
+                        tag: 'pwd', 
+                        label: 'Password',
+                        isPassword: true,
+                        validator: (s) => s.isEmpty ? 'You have to fill out this field' : null
+                      ),
+                      FormFieldConfig<int>(
+                        tag: 'int', 
+                        label: 'Integer',
+                        isPassword: true,
+//                        validator: (i) => i>0 ? 'Only positive Numbers' : null
+                      ),
+                      FormFieldConfig<double>(
+                        tag: 'double', 
+                        label: 'Double',
+                        isPassword: true,
+                        validator: (s) => int.tryParse(s) > 0 ? 'Only positive Numbers' : null
+                      ),
+                      FormFieldConfig<bool>(
+                        tag: 'bool', 
+                        label: 'Bool',
+                        isPassword: true,
+//                        validator: (b) => !bas  ? 'You have to select' : null
+                      ),
+                    ]);
+                print(result);
+              },
+              child: Text(
+                'Form Dialog:',
+              ),
+            ),
           ],
         ),
       ),

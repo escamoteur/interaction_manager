@@ -6,6 +6,8 @@ import 'package:get_it/get_it.dart';
 import 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 import 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
 
+import 'dialog_builders/form_dialog.dart';
+
 export 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 export 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
 
@@ -19,19 +21,22 @@ class InteractionManager {
 
   bool allowReasigningDialogs = false;
 
-  void setRootNavigator(NavigatorState navigatorState) => _rootNavigatorState = navigatorState;
+  void setRootNavigator(NavigatorState navigatorState) =>
+      _rootNavigatorState = navigatorState;
 
   Future<T> navigateTo<T>(String routeName) {
     BuildContext childContext;
-    _rootNavigatorState.context.visitChildElements((element) => childContext = element);
+    _rootNavigatorState.context
+        .visitChildElements((element) => childContext = element);
 
     return Navigator.of(childContext).pushNamed<T>(routeName);
   }
 
   void closeDialog<TResult>([TResult result]) {
     if (_numOpenDialogs > 0) {
-          BuildContext childContext;
-    _rootNavigatorState.context.visitChildElements((element) => childContext = element);
+      BuildContext childContext;
+      _rootNavigatorState.context
+          .visitChildElements((element) => childContext = element);
 
       Navigator.of(childContext).pop<TResult>(result);
     }
@@ -43,8 +48,9 @@ class InteractionManager {
       bool barrierDismissible = false}) async {
     ResultType result;
     _numOpenDialogs++;
-        BuildContext childContext;
-    _rootNavigatorState.context.visitChildElements((element) => childContext = element);
+    BuildContext childContext;
+    _rootNavigatorState.context
+        .visitChildElements((element) => childContext = element);
 
     if (Platform.isAndroid) {
       result = await showDialog<ResultType>(
@@ -109,13 +115,45 @@ class InteractionManager {
         barrierDismissible: barrierDismissible);
   }
 
+  Future<Map<String, Object>> showFormDialog({
+    String title,
+    List<FormFieldConfig> fields,
+    String okButtonText = 'OK',
+    String cancelButtonText = 'Cancel',
+    String header,
+    String footer,
+    EdgeInsets defaultFieldPadding = const EdgeInsets.only(top: 16),
+    double labelSpacing = 8,
+    TextStyle labelStyle,
+    TextStyle fieldStyle,
+    VoidCallback onValidationError,
+    bool barrierDismissible = false,
+  }) async {
+    return await showRegisteredDialog<FormDialogConfig, Map<String, Object>>(
+      dialogName: FormDialog.dialogId,
+      data: FormDialogConfig(
+        title: title,
+        fields: fields,
+        okButtonText: okButtonText,
+        cancelButtonText: cancelButtonText,
+        header: header,
+        footer: footer,
+        defaultFieldPadding: defaultFieldPadding,
+        labelSpacing: labelSpacing,
+        labelStyle: labelStyle,
+        fieldStyle: fieldStyle,
+        onValidationError: onValidationError,
+      ),
+      barrierDismissible: barrierDismissible,
+    );
+  }
+
   Future<MessageDialogResults> showQueryDialog(
     String message, {
     String title,
     Map<MessageDialogResults, String> buttonDefinitions = const {
       MessageDialogResults.yes: 'Yes',
       MessageDialogResults.no: 'No',
-      MessageDialogResults.cancel: 'Cancel',
     },
     bool barrierDismissible = false,
   }) async {
@@ -164,6 +202,8 @@ class InteractionManager {
         MessageDialog.build, MessageDialog.dialogId);
     registerCustomDialog<NetworkConfigurationDialogConfig>(
         NetworkConfigurationDialog.build, NetworkConfigurationDialog.dialogId);
+    registerCustomDialog<FormDialogConfig>(
+        FormDialog.build, FormDialog.dialogId);
   }
 }
 
@@ -207,7 +247,8 @@ class _InteractionConnectorState extends State<InteractionConnector> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    GetIt.I<InteractionManager>().setRootNavigator(Navigator.of(context,rootNavigator: true));
+    GetIt.I<InteractionManager>()
+        .setRootNavigator(Navigator.of(context, rootNavigator: true));
   }
 
   @override
