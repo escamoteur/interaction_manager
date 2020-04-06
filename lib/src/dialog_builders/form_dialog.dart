@@ -250,32 +250,21 @@ class CheckboxFormField extends FormField<bool> {
           initialValue: initialValue,
           autovalidate: autovalidate,
           builder: (FormFieldState<bool> state) {
-            return SizedBox(
-              height: 32,
-              child: Stack(
-                overflow: Overflow.visible,
-                children: <Widget>[
-                  Positioned(
-                    left: -24,
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: CheckboxListTile(
-                      dense: state.hasError,
-                      title: title,
-                      value: state.value ?? false,
-                      onChanged: state.didChange,
-                      subtitle: state.hasError
-                          ? Text(
-                              state.errorText,
-                              style: TextStyle(
-                                  color: Theme.of(context).errorColor),
-                            )
-                          : null,
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
-                  ),
-                ],
+            return Transform.translate(transformHitTests: true,
+                          offset: const Offset(-24, 0),
+                          child: CheckboxListTile(
+                dense: state.hasError,
+                title: title,
+                value: state.value ?? false,
+                onChanged: state.didChange,
+                subtitle: state.hasError
+                    ? Text(
+                        state.errorText,
+                        style: TextStyle(
+                            color: Theme.of(context).errorColor),
+                      )
+                    : null,
+                controlAffinity: ListTileControlAffinity.leading,
               ),
             );
           },

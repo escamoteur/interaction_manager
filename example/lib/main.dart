@@ -15,7 +15,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: InteractionConnector(
-          dialogsInitFunction: registerDialogs, child: MyHomePage()),
+          dialogsInitFunction: registerDialogs, 
+          child: MyHomePage()),
     );
   }
 }
@@ -40,33 +41,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            RaisedButton(
-              onPressed: () async {
-                await GetIt.I<InteractionManager>()
-                    .showCustomDialog<Map<String, dynamic>, void>(
-                  dialogBuilder: (context, data) => AlertDialog(
-                    title: Text(data['title']),
-                    content: Text(data['message']),
-                    actions: <Widget>[
-                      FlatButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(data['buttonText']),
-                      ),
-                    ],
-                  ),
-                  data: {
-                    'title': 'This is the Title',
-                    'message': 'Direct Display',
-                    'buttonText': 'OK'
-                  },
-                );
-              },
-              child: Text(
-                'Direct CustomDialogCall:',
-              ),
-            ),
             RaisedButton(
               onPressed: () async {
                 await GetIt.I<InteractionManager>()
@@ -96,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             RaisedButton(
               onPressed: () async {
-                var result =
+                MessageDialogResults result =
                     await GetIt.I<InteractionManager>().showQueryDialog(
                   'This is a query dialog!',
                   title: 'Query Dialog',
@@ -118,6 +92,17 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: Text(
                 'Network Dialog:',
+              ),
+            ),
+            RaisedButton(
+              onPressed: () async {
+                await GetIt.I<InteractionManager>()
+                    .showLoginDialog(
+                  okButtonText: 'OK',
+                );
+              },
+              child: Text(
+                'Login Dialog:',
               ),
             ),
             RaisedButton(

@@ -1,119 +1,152 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:get_it/get_it.dart';
 import 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 import 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
+import 'package:interaction_manager/src/interaction_manager_impl.dart';
 
 import 'dialog_builders/form_dialog.dart';
 
 export 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 export 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
 
+/// To register a dialog you have to provide a builder function that
+/// returns the content of the dialog that has this signatur.
+/// The generic parameter [T] defines the type of data that you want
+/// to pass when the dialog should be displayed. It will be passed
+/// to the builder function
 typedef DialogBuilderFunc<T> = Widget Function(BuildContext, T);
 
-class InteractionManager {
-  NavigatorState _rootNavigatorState;
-  int _numOpenDialogs = 0;
-  Map<String, _DialogRegistration<Object>> _dialogRegistry =
-      <String, _DialogRegistration>{};
+/// The [InteractionManager] allows you to display dialogs and push `Routes` from
+/// anywhere in your code even from places where this is normally not possible because
+/// you might not have a `BuildContext` available like from your business logic.
+/// To make this possible you have to register builder functions for your dialogs and
+/// add an [InteractionConnector] widget directly above
+/// your `Material/CupertinoApp` like
+///``` 
+/// return MaterialApp(
+///    theme: ThemeData(
+///        brightness: Brightness.dark,
+///        accentColor: Colors.white,
+///    home: InteractionConnector(
+///       dialogsInitFunction: registerDialogs, 
+///       appInitFunction: () async => registerBackend(),
+///       child: StartUpPage()),
+/// ```
+/// Use [dialogsInitFunction] to register your own dialogs
+/// The function that you pass to [appInitFunction] will be called after
+/// the [InteractionManager] is initialized so it can be used inside of [appInitFunction]
+/// 
+/// [InteractionManager] registers itself inside `GetIt` (https://pub.dev/packages/get_it) so
+/// you can access it from anywhere in your app when you add `GetIt` to your project like it
+/// this example that displays a [QueryDialog]
+/// ```
+///  MessageDialogResults result =
+///      await GetIt.I<InteractionManager>().showQueryDialog(
+///    'This is a query dialog!',
+///    title: 'Query Dialog',
+///  );
+/// ```
+/// This was also an example for the available standard dialogs that you can directly
+/// use: 
+///  * MessageDialog
+///  * QueryDialog
+///  * LoginDialog
+///  * NetworkConfigurationDialog
+///  * FormDialog
+/// 
+/// More details in the documentation of the methods and classes below.
+abstract class InteractionManager {
+  /// Dialogs are registered with a name. In most cases registering more
+  /// than one dialog with the same name is probably a bug. Therefore an
+  /// assertion will be thrown if you try.
+  /// If you really need to replace a registered dialog set [allowReassigningDialogs]
+  /// to `true`.
+  bool allowReassigningDialogs = false;
 
-  bool allowReasigningDialogs = false;
+  /// [navigateTo] allows you to push a named `Route` from anywhere in your app.
+  ///The route name will be passed to the root navigator's [onGenerateRoute] callback . 
+  ///The returned route will be pushed into the navigator. 
+  ///The new route and the previous route (if any) are notified (see [Route.didPush] 
+  ///and [Route.didChangeNext]). If the [Navigator] has any [Navigator.observers], 
+  ///they will be notified as well (see [NavigatorObserver.didPush]).
+  ///Ongoing gestures within the current route are canceled when a new route is pushed.
+  ///
+  ///Returns a [Future] that completes to the result value passed to [pop] when the 
+  ///pushed route is popped off the navigator.
+  ///The [T] type argument is the type of the return value of the route.
+  ///
+  ///To use [pushNamed], an [onGenerateRoute] callback must be provided,
+  ///
+  ///The provided arguments are passed to the pushed route via [RouteSettings.arguments]. 
+  ///Any object can be passed as arguments (e.g. a [String], [int], or an instance of a custom MyRouteArguments class). Often, a [Map] is used to pass key-value pairs.
+  ///
+  ///The arguments may be used in [Navigator.onGenerateRoute] or [Navigator.onUnknownRoute] to construct the route.
+  Future<T> navigateTo<T>(String routeName, {Object arguments});
 
-  void setRootNavigator(NavigatorState navigatorState) =>
-      _rootNavigatorState = navigatorState;
+  /// If the [InteractionManager] has open dialog(s) this will close the top one. You can pass an optional
+  /// argument [result] that will be received at the place where the dialog was opened as if the dialog 
+  /// popped itself with it
+  void closeDialog<TResult>([TResult result]);
 
-  Future<T> navigateTo<T>(String routeName) {
-    BuildContext childContext;
-    _rootNavigatorState.context
-        .visitChildElements((element) => childContext = element);
-
-    return Navigator.of(childContext).pushNamed<T>(routeName);
-  }
-
-  void closeDialog<TResult>([TResult result]) {
-    if (_numOpenDialogs > 0) {
-      BuildContext childContext;
-      _rootNavigatorState.context
-          .visitChildElements((element) => childContext = element);
-
-      Navigator.of(childContext).pop<TResult>(result);
-    }
-  }
-
-  Future<ResultType> showCustomDialog<DialogDataType, ResultType>(
-      {DialogBuilderFunc<DialogDataType> dialogBuilder,
-      DialogDataType data,
-      bool barrierDismissible = false}) async {
-    ResultType result;
-    _numOpenDialogs++;
-    BuildContext childContext;
-    _rootNavigatorState.context
-        .visitChildElements((element) => childContext = element);
-
-    if (Platform.isAndroid) {
-      result = await showDialog<ResultType>(
-          context: childContext,
-          barrierDismissible: barrierDismissible,
-          builder: (context) => dialogBuilder(context, data));
-    } else if (Platform.isIOS) {
-      result = await showCupertinoDialog<ResultType>(
-          context: childContext,
-          builder: (context) => dialogBuilder(context, data));
-    }
-
-    /// todo add other platforms
-    else {
-      result = await showDialog<ResultType>(
-          context: childContext,
-          barrierDismissible: barrierDismissible,
-          builder: (context) => dialogBuilder(context, data));
-    }
-    _numOpenDialogs--;
-    return result;
-  }
 
   void registerCustomDialog<DialogDataType>(
-      DialogBuilderFunc<DialogDataType> builder, String dialogName) {
-    if (!allowReasigningDialogs && _dialogRegistry.containsKey(dialogName)) {
-      throw (StateError(
-          'There is already a dialog with name: "$dialogName" registered'));
-    }
-    _dialogRegistry[dialogName] = _DialogRegistration<DialogDataType>(builder);
-  }
+      DialogBuilderFunc<DialogDataType> builder, String dialogName);
 
   Future<ResultType> showRegisteredDialog<DialogDataType, ResultType>(
       {String dialogName,
       DialogDataType data,
-      bool barrierDismissible = false}) {
-    if (!_dialogRegistry.containsKey(dialogName)) {
-      throw (StateError(
-          'There is no dialog with that name: "$dialogName" registered'));
-    }
-
-    final dialogRegistry =
-        _dialogRegistry[dialogName] as _DialogRegistration<DialogDataType>;
-    return showCustomDialog<DialogDataType, ResultType>(
-        dialogBuilder: dialogRegistry.builderFunc,
-        data: data,
-        barrierDismissible: barrierDismissible);
-  }
+      bool barrierDismissible = false});
 
   Future showMessageDialog(
     String message, {
     String title,
     String closeButtonText = 'OK',
     bool barrierDismissible = false,
-  }) async {
-    return await showRegisteredDialog<MessageDialogConfig, void>(
-        dialogName: MessageDialog.dialogId,
-        data: MessageDialogConfig(
-            message: message,
-            title: title,
-            buttonDefinitions: {MessageDialogResults.ok: closeButtonText}),
-        barrierDismissible: barrierDismissible);
-  }
+  });
+
+
+  Future<Map<String, Object>> showLoginDialog({
+    String title = 'Login',
+    String okButtonText = 'OK',
+    String cancelButtonText,
+    String logInLabel = 'User name',
+    String passwordLabel = 'Password',
+    String header,
+    String footer,
+    String Function(String) loginValidator,
+    String Function(String) passwordValidator,
+    EdgeInsets defaultFieldPadding = const EdgeInsets.only(bottom: 24),
+    double labelSpacing = 0,
+    TextStyle labelStyle,
+    TextStyle fieldStyle,
+    VoidCallback onValidationError,
+    bool barrierDismissible = false,
+  });
+
+  Future<MessageDialogResults> showQueryDialog(
+    String message, {
+    String title,
+    Map<MessageDialogResults, String> buttonDefinitions = const {
+      MessageDialogResults.yes: 'Yes',
+      MessageDialogResults.no: 'No',
+    },
+    bool barrierDismissible = false,
+  });
+
+  Future<NetworkConfiguration> showNetworkConfigurationDialog({
+    String title = 'Connection Settings',
+    String message,
+    String serverAdressLabel = 'Server Address',
+    String portLabel = 'Server Port',
+    String sslLabel = 'Use SSL',
+    bool showProtocolSelection = true,
+    String portFormatErrorMessage = 'Only Numbers',
+    String okButtonText = 'Ok',
+    String cancelButtonText,
+    NetworkConfiguration networkConfiguration = const NetworkConfiguration(),
+    bool barrierDismissible = false,
+  });
 
   Future<Map<String, Object>> showFormDialog({
     String title,
@@ -128,89 +161,13 @@ class InteractionManager {
     TextStyle fieldStyle,
     VoidCallback onValidationError,
     bool barrierDismissible = false,
-  }) async {
-    return await showRegisteredDialog<FormDialogConfig, Map<String, Object>>(
-      dialogName: FormDialog.dialogId,
-      data: FormDialogConfig(
-        title: title,
-        fields: fields,
-        okButtonText: okButtonText,
-        cancelButtonText: cancelButtonText,
-        header: header,
-        footer: footer,
-        defaultFieldPadding: defaultFieldPadding,
-        labelSpacing: labelSpacing,
-        labelStyle: labelStyle,
-        fieldStyle: fieldStyle,
-        onValidationError: onValidationError,
-      ),
-      barrierDismissible: barrierDismissible,
-    );
-  }
+  });
 
-  Future<MessageDialogResults> showQueryDialog(
-    String message, {
-    String title,
-    Map<MessageDialogResults, String> buttonDefinitions = const {
-      MessageDialogResults.yes: 'Yes',
-      MessageDialogResults.no: 'No',
-    },
-    bool barrierDismissible = false,
-  }) async {
-    return await showRegisteredDialog<MessageDialogConfig,
-            MessageDialogResults>(
-        dialogName: MessageDialog.dialogId,
-        data: MessageDialogConfig(
-            message: message,
-            title: title,
-            buttonDefinitions: buttonDefinitions),
-        barrierDismissible: barrierDismissible);
-  }
 
-  Future<NetworkConfiguration> showNetworkConfigurationDialog({
-    String title = 'Connection Settings',
-    String message,
-    String serverAdressLabel = 'Server Address',
-    String portLabel = 'Server Port',
-    String sslLabel = 'Use SSL',
-    bool showProtocolSelection = true,
-    String portFormatErrorMessage = 'Only Numbers',
-    String okButtonText = 'Ok',
-    String cancelButtonText,
-    NetworkConfiguration networkConfiguration = const NetworkConfiguration(),
-    bool barrierDismissible = false,
-  }) async {
-    return await showRegisteredDialog<NetworkConfigurationDialogConfig,
-            NetworkConfiguration>(
-        dialogName: NetworkConfigurationDialog.dialogId,
-        barrierDismissible: barrierDismissible,
-        data: NetworkConfigurationDialogConfig(
-            title: title,
-            message: message,
-            portLabel: portLabel,
-            okButtonText: okButtonText,
-            cancelButtonText: cancelButtonText,
-            portFormatErrorMessage: portFormatErrorMessage,
-            showProtocolSelection: showProtocolSelection,
-            sslLabel: sslLabel,
-            serverAdressLabel: serverAdressLabel,
-            netWorkConfiguration: networkConfiguration));
-  }
+  /// If you don't want to use the [InteractionConnector] you have to set the
+  /// `NavigatorState` of your root navigator with this method.
+  void setRootNavigator(NavigatorState navigatorState);
 
-  void _registerStandardDialog() {
-    registerCustomDialog<MessageDialogConfig>(
-        MessageDialog.build, MessageDialog.dialogId);
-    registerCustomDialog<NetworkConfigurationDialogConfig>(
-        NetworkConfigurationDialog.build, NetworkConfigurationDialog.dialogId);
-    registerCustomDialog<FormDialogConfig>(
-        FormDialog.build, FormDialog.dialogId);
-  }
-}
-
-class _DialogRegistration<T> {
-  final DialogBuilderFunc<T> builderFunc;
-
-  _DialogRegistration(this.builderFunc);
 }
 
 class InteractionConnector extends StatefulWidget {
@@ -227,32 +184,6 @@ class InteractionConnector extends StatefulWidget {
       {this.appInitFunction, this.dialogsInitFunction, this.child, Key key})
       : super(key: key);
   @override
-  _InteractionConnectorState createState() => _InteractionConnectorState();
+  InteractionConnectorState createState() => InteractionConnectorState();
 }
 
-class _InteractionConnectorState extends State<InteractionConnector> {
-  @override
-  void initState() {
-    if (!GetIt.I.isRegistered<InteractionManager>()) {
-      var interactionManager = InteractionManager();
-      GetIt.I.registerSingleton<InteractionManager>(interactionManager);
-
-      interactionManager._registerStandardDialog();
-      widget.dialogsInitFunction?.call(interactionManager);
-      widget.appInitFunction?.call();
-    }
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    GetIt.I<InteractionManager>()
-        .setRootNavigator(Navigator.of(context, rootNavigator: true));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.child;
-  }
-}
