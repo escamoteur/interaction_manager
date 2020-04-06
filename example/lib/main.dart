@@ -138,26 +138,26 @@ class _MyHomePageState extends State<MyHomePage> {
                       FormFieldConfig<String>(
                         tag: 'pwd', 
                         label: 'Password',
-                        isPassword: true,
+                        obscureText: true,
                         validator: (s) => s.isEmpty ? 'You have to fill out this field' : null
                       ),
                       FormFieldConfig<int>(
                         tag: 'int', 
                         label: 'Integer',
-                        isPassword: true,
+                        obscureText: true,
 //                        validator: (i) => i>0 ? 'Only positive Numbers' : null
                       ),
                       FormFieldConfig<double>(
                         tag: 'double', 
                         label: 'Double',
-                        isPassword: true,
-                        validator: (s) => int.tryParse(s) > 0 ? 'Only positive Numbers' : null
+                        obscureText: true,
+                        validator: (s) => int.tryParse(s) ?? -1 > 0 ? 'Only positive Numbers' : null
                       ),
                       FormFieldConfig<bool>(
                         tag: 'bool', 
                         label: 'Bool',
-                        isPassword: true,
-//                        validator: (b) => !bas  ? 'You have to select' : null
+                        obscureText: true,
+                        validator: (b) => b == 'false'  ? 'You have to select' : null
                       ),
                     ]);
                 print(result);

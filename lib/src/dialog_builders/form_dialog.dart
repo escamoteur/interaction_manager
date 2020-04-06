@@ -8,7 +8,7 @@ class FormFieldConfig<T> {
   final String label;
   final T initialValue;
   final EdgeInsets padding;
-  final bool isPassword;
+  final bool obscureText;
   final Type type;
   final String Function(String val) validator;
   final TextStyle labelStyle;
@@ -19,7 +19,7 @@ class FormFieldConfig<T> {
       @required this.label,
       this.initialValue,
       this.padding = EdgeInsets.zero,
-      this.isPassword = false,
+      this.obscureText = false,
       this.validator,
       this.labelStyle,
       this.fieldStyle})
@@ -44,7 +44,7 @@ class FormDialogConfig {
     this.header,
     this.footer,
     this.fields,
-    this.defaultFieldPadding = const EdgeInsets.only(top: 16),
+    this.defaultFieldPadding = const EdgeInsets.only(bottom: 16),
     this.okButtonText,
     this.cancelButtonText,
     this.labelSpacing = 8,
@@ -81,9 +81,9 @@ class _FormDialogWidgetState extends State<FormDialogWidget> {
     switch (fieldConfig.type) {
       case String:
         field = TextFormField(
-          initialValue: fieldConfig.initialValue  as String ?? '',
+          initialValue: fieldConfig.initialValue as String ?? '',
           style: fieldConfig.fieldStyle ?? dialogConfig.fieldStyle,
-          obscureText: fieldConfig.isPassword,
+          obscureText: fieldConfig.obscureText ?? false,
           onSaved: (s) => _formResults[fieldConfig.tag] = s,
           validator: fieldConfig.validator,
         );
@@ -92,7 +92,7 @@ class _FormDialogWidgetState extends State<FormDialogWidget> {
         field = TextFormField(
           initialValue: fieldConfig.initialValue?.toString() ?? '',
           style: fieldConfig.fieldStyle ?? dialogConfig.fieldStyle,
-          obscureText: fieldConfig.isPassword,
+          obscureText: fieldConfig.obscureText ?? false,
           keyboardType: TextInputType.numberWithOptions(decimal: false),
           onSaved: (s) => _formResults[fieldConfig.tag] = int.tryParse(s),
           validator: fieldConfig.validator ??
@@ -105,7 +105,7 @@ class _FormDialogWidgetState extends State<FormDialogWidget> {
           initialValue:
               (fieldConfig.initialValue as double)?.toStringAsFixed(2) ?? '',
           style: fieldConfig.fieldStyle ?? dialogConfig.fieldStyle,
-          obscureText: fieldConfig.isPassword,
+          obscureText: fieldConfig.obscureText ?? false,
           keyboardType: TextInputType.numberWithOptions(decimal: true),
           onSaved: (s) => _formResults[fieldConfig.tag] = double.tryParse(s),
           validator: fieldConfig.validator ??
@@ -131,10 +131,12 @@ class _FormDialogWidgetState extends State<FormDialogWidget> {
                 padding: EdgeInsets.only(right: 8),
                 child: CheckboxFormField(
                   context: context,
-                  title:
-                      Text(dialogConfig.title, style: fieldConfig.labelStyle),
-                  initialValue: fieldConfig.initialValue,
-                  //validator: fieldConfig.validator,
+                  title: Text(dialogConfig.title ?? '',
+                      style: fieldConfig.labelStyle),
+                  initialValue: fieldConfig.initialValue ?? false,
+                  validator: (b) {
+                    return fieldConfig.validator(b ? 'true' : 'false');
+                  },
                   onSaved: (b) => _formResults[fieldConfig.tag] = b,
                 ),
               ),
@@ -228,7 +230,7 @@ class _FormDialogWidgetState extends State<FormDialogWidget> {
     final formState = _formKey.currentState;
     if (formState.validate()) {
       formState.save();
-    }else{
+    } else {
       widget.dialogConfig.onValidationError?.call();
     }
   }
@@ -248,18 +250,33 @@ class CheckboxFormField extends FormField<bool> {
           initialValue: initialValue,
           autovalidate: autovalidate,
           builder: (FormFieldState<bool> state) {
-            return CheckboxListTile(
-              dense: state.hasError,
-              title: title,
-              value: state.value ?? false,
-              onChanged: state.didChange,
-              subtitle: state.hasError
-                  ? Text(
-                      state.errorText,
-                      style: TextStyle(color: Theme.of(context).errorColor),
-                    )
-                  : null,
-              controlAffinity: ListTileControlAffinity.leading,
+            return SizedBox(
+              height: 32,
+              child: Stack(
+                overflow: Overflow.visible,
+                children: <Widget>[
+                  Positioned(
+                    left: -24,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: CheckboxListTile(
+                      dense: state.hasError,
+                      title: title,
+                      value: state.value ?? false,
+                      onChanged: state.didChange,
+                      subtitle: state.hasError
+                          ? Text(
+                              state.errorText,
+                              style: TextStyle(
+                                  color: Theme.of(context).errorColor),
+                            )
+                          : null,
+                      controlAffinity: ListTileControlAffinity.leading,
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         );
