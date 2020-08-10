@@ -133,7 +133,7 @@ class _FormDialogWidgetState extends State<FormDialogWidget> {
                   context: context,
                   title: Text(dialogConfig.title ?? '',
                       style: fieldConfig.labelStyle),
-                  initialValue: fieldConfig.initialValue ?? false,
+                  initialValue: fieldConfig.initialValue as bool ?? false,
                   validator: (b) {
                     return fieldConfig.validator(b ? 'true' : 'false');
                   },
@@ -156,28 +156,33 @@ class _FormDialogWidgetState extends State<FormDialogWidget> {
   Widget build(BuildContext context) {
     final dlgConfig = widget.dialogConfig;
     var content = SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (dlgConfig.header != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: Text(dlgConfig.header),
-              ),
-            for (final field in dlgConfig.fields)
-              _fieldFactory(
-                field,
-                dlgConfig,
-              ),
-            if (dlgConfig.footer != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: Text(dlgConfig.footer),
-              ),
-          ],
+      child: WillPopScope(
+        onWillPop: () async {
+          return dlgConfig.cancelButtonText != null || onOk();
+        },
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (dlgConfig.header != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: Text(dlgConfig.header),
+                ),
+              for (final field in dlgConfig.fields)
+                _fieldFactory(
+                  field,
+                  dlgConfig,
+                ),
+              if (dlgConfig.footer != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: Text(dlgConfig.footer),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -216,8 +221,9 @@ class _FormDialogWidgetState extends State<FormDialogWidget> {
             ),
           FlatButton(
             onPressed: () {
-              onOk();
-              Navigator.of(context).pop(_formResults);
+              if (onOk()) {
+                Navigator.of(context).pop(_formResults);
+              }
             },
             child: Text(dlgConfig.okButtonText),
           ),
@@ -226,12 +232,14 @@ class _FormDialogWidgetState extends State<FormDialogWidget> {
     }
   }
 
-  void onOk() {
+  bool onOk() {
     final formState = _formKey.currentState;
     if (formState.validate()) {
       formState.save();
+      return true;
     } else {
       widget.dialogConfig.onValidationError?.call();
+      return false;
     }
   }
 }
@@ -250,9 +258,10 @@ class CheckboxFormField extends FormField<bool> {
           initialValue: initialValue,
           autovalidate: autovalidate,
           builder: (FormFieldState<bool> state) {
-            return Transform.translate(transformHitTests: true,
-                          offset: const Offset(-24, 0),
-                          child: CheckboxListTile(
+            return Transform.translate(
+              transformHitTests: true,
+              offset: const Offset(-24, 0),
+              child: CheckboxListTile(
                 dense: state.hasError,
                 title: title,
                 value: state.value ?? false,
@@ -260,8 +269,7 @@ class CheckboxFormField extends FormField<bool> {
                 subtitle: state.hasError
                     ? Text(
                         state.errorText,
-                        style: TextStyle(
-                            color: Theme.of(context).errorColor),
+                        style: TextStyle(color: Theme.of(context).errorColor),
                       )
                     : null,
                 controlAffinity: ListTileControlAffinity.leading,

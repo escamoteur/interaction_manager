@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-enum MessageDialogResults { ok, cancel, yes, no }
+import 'package:interaction_manager/src/interaction_manager.dart';
 
 class MessageDialogConfig {
   final String title;

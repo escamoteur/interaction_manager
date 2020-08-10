@@ -14,25 +14,30 @@ export 'package:interaction_manager/src/dialog_builders/network_configuration_di
 
 typedef DialogBuilderFunc<T> = Widget Function(BuildContext, T);
 
-class InteractionManagerImplementation extends InteractionManager {
+class InteractionManagerImplementation implements InteractionManager {
   NavigatorState _rootNavigatorState;
   int _numOpenDialogs = 0;
   Map<String, _DialogRegistration<Object>> _dialogRegistry =
       <String, _DialogRegistration>{};
 
-  bool allowReasigningDialogs = false;
+  @override
+  bool allowReassigningDialogs = false;
 
+  @override
   void setRootNavigator(NavigatorState navigatorState) =>
       _rootNavigatorState = navigatorState;
 
+  @override
   Future<T> navigateTo<T>(String routeName, {Object arguments}) {
     BuildContext childContext;
     _rootNavigatorState.context
         .visitChildElements((element) => childContext = element);
 
-    return Navigator.of(childContext).pushNamed<T>(routeName, arguments: arguments);
+    return Navigator.of(childContext)
+        .pushNamed<T>(routeName, arguments: arguments);
   }
 
+  @override
   void closeDialog<TResult>([TResult result]) {
     if (_numOpenDialogs > 0) {
       BuildContext childContext;
@@ -75,15 +80,17 @@ class InteractionManagerImplementation extends InteractionManager {
     return result;
   }
 
+  @override
   void registerCustomDialog<DialogDataType>(
       DialogBuilderFunc<DialogDataType> builder, String dialogName) {
-    if (!allowReasigningDialogs && _dialogRegistry.containsKey(dialogName)) {
+    if (!allowReassigningDialogs && _dialogRegistry.containsKey(dialogName)) {
       throw (StateError(
           'There is already a dialog with name: "$dialogName" registered'));
     }
     _dialogRegistry[dialogName] = _DialogRegistration<DialogDataType>(builder);
   }
 
+  @override
   Future<ResultType> showRegisteredDialog<DialogDataType, ResultType>(
       {String dialogName,
       DialogDataType data,
@@ -101,6 +108,7 @@ class InteractionManagerImplementation extends InteractionManager {
         barrierDismissible: barrierDismissible);
   }
 
+  @override
   Future showMessageDialog(
     String message, {
     String title,
@@ -116,6 +124,7 @@ class InteractionManagerImplementation extends InteractionManager {
         barrierDismissible: barrierDismissible);
   }
 
+  @override
   Future<Map<String, Object>> showFormDialog({
     String title,
     List<FormFieldConfig> fields,
@@ -149,7 +158,8 @@ class InteractionManagerImplementation extends InteractionManager {
     );
   }
 
-  Future<Map<String, Object>> showLoginDialog({
+  @override
+  Future<Map<String, String>> showLoginDialog({
     String title = 'Login',
     String okButtonText = 'OK',
     String cancelButtonText,
@@ -166,21 +176,22 @@ class InteractionManagerImplementation extends InteractionManager {
     VoidCallback onValidationError,
     bool barrierDismissible = false,
   }) async {
-    return await showRegisteredDialog<FormDialogConfig, Map<String, Object>>(
+    var result =
+        await showRegisteredDialog<FormDialogConfig, Map<String, Object>>(
       dialogName: FormDialog.dialogId,
       data: FormDialogConfig(
         title: title,
         fields: [
           FormFieldConfig<String>(
-              tag: 'name',
-              label: logInLabel,
-              validator: loginValidator
+            tag: 'name',
+            label: logInLabel,
+            validator: loginValidator,
           ),
           FormFieldConfig<String>(
-              tag: 'pwd',
-              label: passwordLabel,
-              obscureText: true,
-              validator: passwordValidator,
+            tag: 'pwd',
+            label: passwordLabel,
+            obscureText: true,
+            validator: passwordValidator,
           )
         ],
         okButtonText: okButtonText,
@@ -195,8 +206,11 @@ class InteractionManagerImplementation extends InteractionManager {
       ),
       barrierDismissible: barrierDismissible,
     );
+    return result
+        .map<String, String>((key, value) => MapEntry(key, value.toString()));
   }
 
+  @override
   Future<MessageDialogResults> showQueryDialog(
     String message, {
     String title,
@@ -216,6 +230,7 @@ class InteractionManagerImplementation extends InteractionManager {
         barrierDismissible: barrierDismissible);
   }
 
+  @override
   Future<NetworkConfiguration> showNetworkConfigurationDialog({
     String title = 'Connection Settings',
     String message,

@@ -2,11 +2,7 @@ include: package:lint/analysis_options_package.yaml
 
 # analyzer:
 #   exclude:
-
-language:
-  strict-inference: true
-  strict-raw-types: true
-
+    
 linter:
   rules:
     # ------ Disable individual rules ----- #

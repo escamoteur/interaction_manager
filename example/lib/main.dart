@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () async {
                 await GetIt.I<InteractionManager>()
                     .showRegisteredDialog<Map<String, String>, void>(
-                  dialogName: 'MessageDialog',
+                  dialogName: 'TestDialog',
                   data: {
                     'title': 'This is the Title',
                     'message': 'Registered Dialog',
@@ -99,6 +99,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 await GetIt.I<InteractionManager>()
                     .showLoginDialog(
                   okButtonText: 'OK',
+                  loginValidator: (s){
+                    return s.isEmpty ? 'You have to provide a neme' : null;
+                  }
                 );
               },
               child: Text(
@@ -136,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         tag: 'double', 
                         label: 'Double',
                         obscureText: true,
-                        validator: (s) => int.tryParse(s) ?? -1 > 0 ? 'Only positive Numbers' : null
+                        validator: (s) => (int.tryParse(s) ?? -1) > 0 ? 'Only positive Numbers' : null
                       ),
                       FormFieldConfig<bool>(
                         tag: 'bool', 
