@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:interaction_manager/src/dialog_builders/login_dialog.dart';
 import 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
 import 'package:interaction_manager/src/interaction_manager_impl.dart';
-
-import 'dialog_builders/form_dialog.dart';
 
 export 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 export 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
@@ -15,8 +14,15 @@ export 'package:interaction_manager/src/dialog_builders/network_configuration_di
 /// to the builder function
 typedef DialogBuilderFunc<T> = Widget Function(BuildContext, T);
 
-enum MessageDialogResults { ok, cancel, yes, no, leftButton, middleButton, rightButton }
-
+enum MessageDialogResults {
+  ok,
+  cancel,
+  yes,
+  no,
+  leftButton,
+  middleButton,
+  rightButton
+}
 
 /// The [InteractionManager] allows you to display dialogs and push `Routes` from
 /// anywhere in your code even from places where this is normally not possible because
@@ -125,10 +131,9 @@ abstract class InteractionManager {
     bool barrierDismissible = false,
   });
 
-
   /// displays a message dialog with a row of configurable buttons
   /// You define the buttons by passing a `Map<MessageDialogResults,String>` as [buttonDefinitions]
-  /// where the key of a map entry defines the the value that is returned when the button is pressed, 
+  /// where the key of a map entry defines the the value that is returned when the button is pressed,
   /// the String value is the label of the button.
   /// If [barrierDismissible] is set to `true` a tap outside the dialog will pop it.
   Future<MessageDialogResults> showQueryDialog(
@@ -142,38 +147,24 @@ abstract class InteractionManager {
   });
 
   /// displays a configurable login dialog with an `Ok` and an optional `Cancel`  button.
-  /// [header/footer] optional texts before/after the input fields
-  /// [loginValidator/passwordValidator] optional field validators that get called with the 
-  /// field values when the user presses the `Ok` button. If the function returns a non `null` 
+  /// [header] optional texts before/after the input fields
+  /// [loginValidator/passwordValidator] optional field validators that get called with the
+  /// field values when the user presses the `Ok` button. If the function returns a non `null`
   /// String it gets displayed as warning below the fields and the dialog isn't closed.
-  /// [defaultFieldPadding] the padding of each field
   /// [onValidationError] optional callback that is called when one of the validators returns
   /// an error message.
-  /// [labelSpacing] the distance between label and `TextFields`
   /// If [barrierDismissible] is set to `true` a tap outside the dialog will pop it.
-  /// Returned is a `Map<String, String>` with this structure:
-  /// ```
-  /// { 
-  ///   'name' : valueOfLoginField,
-  ///   'pwd' : valueOfPasswordField,
-  /// }
-  /// ```
+  /// Returned is a [UserCredential] object with the name and the password
   /// if the user has pressed the "Ok" button otherwise it returns `null`
-  Future<Map<String,String>> showLoginDialog({
+  Future<UserCredentials> showLoginDialog({
     String title = 'Login',
     String okButtonText = 'OK',
     String cancelButtonText,
-    String logInLabel = 'User name',
+    String usernameLabel = 'User name',
     String passwordLabel = 'Password',
     String header,
-    String footer,
-    String Function(String) loginValidator,
+    String Function(String) usernameValidator,
     String Function(String) passwordValidator,
-    EdgeInsets defaultFieldPadding = const EdgeInsets.only(bottom: 24),
-    double labelSpacing = 0,
-    TextStyle labelStyle,
-    TextStyle fieldStyle,
-    VoidCallback onValidationError,
     bool barrierDismissible = false,
   });
 
@@ -188,21 +179,6 @@ abstract class InteractionManager {
     String okButtonText = 'Ok',
     String cancelButtonText,
     NetworkConfiguration networkConfiguration = const NetworkConfiguration(),
-    bool barrierDismissible = false,
-  });
-
-  Future<Map<String, Object>> showFormDialog({
-    String title,
-    List<FormFieldConfig> fields,
-    String okButtonText = 'OK',
-    String cancelButtonText = 'Cancel',
-    String header,
-    String footer,
-    EdgeInsets defaultFieldPadding = const EdgeInsets.only(bottom: 24),
-    double labelSpacing = 0,
-    TextStyle labelStyle,
-    TextStyle fieldStyle,
-    VoidCallback onValidationError,
     bool barrierDismissible = false,
   });
 

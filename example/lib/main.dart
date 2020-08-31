@@ -15,8 +15,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: InteractionConnector(
-          dialogsInitFunction: registerDialogs, 
-          child: MyHomePage()),
+          dialogsInitFunction: registerDialogs, child: MyHomePage()),
     );
   }
 }
@@ -96,62 +95,14 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             RaisedButton(
               onPressed: () async {
-                await GetIt.I<InteractionManager>()
-                    .showLoginDialog(
-                  okButtonText: 'OK',
-                  loginValidator: (s){
-                    return s.isEmpty ? 'You have to provide a neme' : null;
-                  }
-                );
+                await GetIt.I<InteractionManager>().showLoginDialog(
+                    okButtonText: 'OK',
+                    usernameValidator: (s) {
+                      return s.isEmpty ? 'You have to provide a neme' : null;
+                    });
               },
               child: Text(
                 'Login Dialog:',
-              ),
-            ),
-            RaisedButton(
-              onPressed: () async {
-                var result = await GetIt.I<InteractionManager>().showFormDialog(
-                    title: 'Form Dialog',
-                    header: 'Please enter all Fields',
-                    footer: 'This Process takes a little time',
-                    onValidationError: () async =>
-                        await GetIt.I<InteractionManager>().showMessageDialog(
-                            'There are invalid values in your Form'),
-                    fields: [
-                      FormFieldConfig<String>(
-                        tag: 'name', 
-                        label: 'Name',
-                        validator: (s) => s.isEmpty ? 'You have to fill out this field' : null
-                      ),
-                      FormFieldConfig<String>(
-                        tag: 'pwd', 
-                        label: 'Password',
-                        obscureText: true,
-                        validator: (s) => s.isEmpty ? 'You have to fill out this field' : null
-                      ),
-                      FormFieldConfig<int>(
-                        tag: 'int', 
-                        label: 'Integer',
-                        obscureText: true,
-//                        validator: (i) => i>0 ? 'Only positive Numbers' : null
-                      ),
-                      FormFieldConfig<double>(
-                        tag: 'double', 
-                        label: 'Double',
-                        obscureText: true,
-                        validator: (s) => (int.tryParse(s) ?? -1) > 0 ? 'Only positive Numbers' : null
-                      ),
-                      FormFieldConfig<bool>(
-                        tag: 'bool', 
-                        label: 'Bool',
-                        obscureText: true,
-                        validator: (b) => b == 'false'  ? 'You have to select' : null
-                      ),
-                    ]);
-                print(result);
-              },
-              child: Text(
-                'Form Dialog:',
               ),
             ),
           ],

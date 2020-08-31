@@ -1,13 +1,12 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:interaction_manager/interaction_manager.dart';
+import 'package:interaction_manager/src/dialog_builders/login_dialog.dart';
 import 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 import 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
-
-import 'dialog_builders/form_dialog.dart';
 
 export 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 export 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
@@ -125,89 +124,33 @@ class InteractionManagerImplementation implements InteractionManager {
   }
 
   @override
-  Future<Map<String, Object>> showFormDialog({
-    String title,
-    List<FormFieldConfig> fields,
-    String okButtonText = 'OK',
-    String cancelButtonText = 'Cancel',
-    String header,
-    String footer,
-    EdgeInsets defaultFieldPadding = const EdgeInsets.only(bottom: 24),
-    double labelSpacing = 0,
-    TextStyle labelStyle,
-    TextStyle fieldStyle,
-    VoidCallback onValidationError,
-    bool barrierDismissible = false,
-  }) async {
-    return await showRegisteredDialog<FormDialogConfig, Map<String, Object>>(
-      dialogName: FormDialog.dialogId,
-      data: FormDialogConfig(
-        title: title,
-        fields: fields,
-        okButtonText: okButtonText,
-        cancelButtonText: cancelButtonText,
-        header: header,
-        footer: footer,
-        defaultFieldPadding: defaultFieldPadding,
-        labelSpacing: labelSpacing,
-        labelStyle: labelStyle,
-        fieldStyle: fieldStyle,
-        onValidationError: onValidationError,
-      ),
-      barrierDismissible: barrierDismissible,
-    );
-  }
-
-  @override
-  Future<Map<String, String>> showLoginDialog({
+  Future<UserCredentials> showLoginDialog({
     String title = 'Login',
     String okButtonText = 'OK',
     String cancelButtonText,
-    String logInLabel = 'User name',
+    String usernameLabel = 'User name',
     String passwordLabel = 'Password',
     String header,
-    String footer,
-    String Function(String) loginValidator,
+    String userNamePrefill,
+    String Function(String) usernameValidator,
     String Function(String) passwordValidator,
-    EdgeInsets defaultFieldPadding = const EdgeInsets.only(bottom: 24),
-    double labelSpacing = 0,
-    TextStyle labelStyle,
-    TextStyle fieldStyle,
-    VoidCallback onValidationError,
     bool barrierDismissible = false,
   }) async {
-    var result =
-        await showRegisteredDialog<FormDialogConfig, Map<String, Object>>(
-      dialogName: FormDialog.dialogId,
-      data: FormDialogConfig(
+    return await showRegisteredDialog<LoginDialogConfig, UserCredentials>(
+      dialogName: LoginDialog.dialogId,
+      data: LoginDialogConfig(
         title: title,
-        fields: [
-          FormFieldConfig<String>(
-            tag: 'name',
-            label: logInLabel,
-            validator: loginValidator,
-          ),
-          FormFieldConfig<String>(
-            tag: 'pwd',
-            label: passwordLabel,
-            obscureText: true,
-            validator: passwordValidator,
-          )
-        ],
         okButtonText: okButtonText,
         cancelButtonText: cancelButtonText,
-        header: header,
-        footer: footer,
-        defaultFieldPadding: defaultFieldPadding,
-        labelSpacing: labelSpacing,
-        labelStyle: labelStyle,
-        fieldStyle: fieldStyle,
-        onValidationError: onValidationError,
+        message: header,
+        userNameLabel: usernameLabel,
+        passwordLabel: passwordLabel,
+        usernameValidator: usernameValidator,
+        userNamePrefill: userNamePrefill,
+        passwordValidator: passwordValidator,
       ),
       barrierDismissible: barrierDismissible,
     );
-    return result
-        .map<String, String>((key, value) => MapEntry(key, value.toString()));
   }
 
   @override
@@ -266,8 +209,8 @@ class InteractionManagerImplementation implements InteractionManager {
         MessageDialog.build, MessageDialog.dialogId);
     registerCustomDialog<NetworkConfigurationDialogConfig>(
         NetworkConfigurationDialog.build, NetworkConfigurationDialog.dialogId);
-    registerCustomDialog<FormDialogConfig>(
-        FormDialog.build, FormDialog.dialogId);
+    registerCustomDialog<LoginDialogConfig>(
+        LoginDialog.build, LoginDialog.dialogId);
   }
 }
 
