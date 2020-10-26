@@ -82,7 +82,7 @@ class LoginWidgetState extends State<LoginWidget> {
         setState(() {});
       } else {
         Navigator.of(context).pop(UserCredentials(
-            userName: userNameController.text,
+            userName: userNameController.text.trim(),
             password: passwordController.text));
       }
     }
@@ -110,6 +110,7 @@ class LoginWidgetState extends State<LoginWidget> {
             controller: passwordController,
             decoration: InputDecoration(errorText: passwordErrorText),
             obscureText: true,
+            onSubmitted: (_) => onOk(),
           ),
         ],
       ),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:interaction_manager/src/dialog_builders/login_dialog.dart';
@@ -192,7 +194,7 @@ class InteractionConnector extends StatefulWidget {
 
   /// Fire and forget async ApplicationInitFunction that will be called as soon as the
   /// Interaction Manager is ready
-  final Future Function() appInitFunction;
+  final FutureOr Function() appInitFunction;
 
   /// Will be called before [appInitFunction] pass here your funtion where you register your custom dialogs.
   final void Function(InteractionManager) dialogsInitFunction;

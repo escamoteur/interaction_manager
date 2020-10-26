@@ -8,7 +8,7 @@ environment:
   sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
-  get_it: ^4.0.0
+  get_it: 5.0.0-alpha2
   lint: ^1.1.0
   flutter:
     sdk: flutter
