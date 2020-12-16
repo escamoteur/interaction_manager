@@ -19,7 +19,7 @@ environment:
 dependencies:
   interaction_manager:
     path: ..
-  get_it: ^4.0.0  
+  get_it: ^5.0.0  
   flutter:
     sdk: flutter
 
