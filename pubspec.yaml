@@ -10,6 +10,7 @@ environment:
 dependencies:
   get_it: ^5.0.0
   lint: ^1.1.0
+  flutter_platform_widgets: any
   flutter:
     sdk: flutter
 

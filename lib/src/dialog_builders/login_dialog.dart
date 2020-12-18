@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class UserCredentials {
   final String userName;
@@ -98,10 +99,11 @@ class LoginWidgetState extends State<LoginWidget> {
               child: Text(dlgConfig.message),
             ),
           Text(dlgConfig.userNameLabel),
-          TextField(
+          PlatformTextField(
             keyboardType: TextInputType.emailAddress,
             controller: userNameController,
-            decoration: InputDecoration(errorText: userNameErrorText),
+            material: (_, __) => MaterialTextFieldData(
+                decoration: InputDecoration(errorText: userNameErrorText)),
           ),
           const SizedBox(height: 16.0),
           Text(dlgConfig.passwordLabel),
