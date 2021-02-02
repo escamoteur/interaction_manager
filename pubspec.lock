@@ -58,9 +58,11 @@ packages:
   flutter_platform_widgets:
     dependency: "direct main"
     description:
-      name: flutter_platform_widgets
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: "flutter1.2.6.0"
+      resolved-ref: dcc61629ba5fc61779d84ddb858ef2769c4b2b4a
+      url: "https://github.com/escamoteur/flutter_platform_widgets.git"
+    source: git
     version: "0.72.0"
   flutter_test:
     dependency: "direct dev"
@@ -165,4 +167,4 @@ packages:
     version: "2.1.0-nullsafety.5"
 sdks:
   dart: ">=2.12.0-0.0 <3.0.0"
-  flutter: ">=1.20.4 <2.0.0"
+  flutter: ">=1.20.4"

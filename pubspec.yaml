@@ -10,7 +10,10 @@ environment:
 dependencies:
   get_it: ^5.0.0
   lint: ^1.1.0
-  flutter_platform_widgets: any
+  flutter_platform_widgets: 
+    git:
+      url: https://github.com/escamoteur/flutter_platform_widgets.git
+      ref: flutter1.2.6.0
   flutter:
     sdk: flutter
 
