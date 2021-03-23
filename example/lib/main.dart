@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -98,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 await GetIt.I<InteractionManager>().showLoginDialog(
                     okButtonText: 'OK',
                     usernameValidator: (s) {
-                      return s.isEmpty ? 'You have to provide a neme' : null;
+                      return s.isEmpty ? 'You have to provide a name' : null;
                     });
               },
               child: Text(

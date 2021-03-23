@@ -91,12 +91,12 @@ abstract class InteractionManager {
   ///Any object can be passed as arguments (e.g. a [String], [int], or an instance of a custom MyRouteArguments class). Often, a [Map] is used to pass key-value pairs.
   ///
   ///The arguments may be used in [Navigator.onGenerateRoute] or [Navigator.onUnknownRoute] to construct the route.
-  Future<T> navigateTo<T>(String routeName, {Object arguments});
+  Future<T?> navigateTo<T>(String routeName, {Object? arguments});
 
   /// If the [InteractionManager] has open dialog(s) this will close the top one. You can pass an optional
   /// argument [result] that will be received at the place where the dialog was opened as if the dialog
   /// popped itself with it
-  void closeDialog<TResult>([TResult result]);
+  void closeDialog<TResult>([TResult? result]);
 
   /// If you want to display your own dialog you have to register them first in the [InteractionManager]
   /// you do this by passing a builder function to [registerCustomDialog] that returns the content of
@@ -116,9 +116,9 @@ abstract class InteractionManager {
   /// [data] that gets passed to the dialogs builder function
   /// If [barrierDismissible] is set to `true` a tap outside the dialog will pop it.
   /// [ResultType] defines which type the data has that the dialog returns when it gets popped
-  Future<ResultType> showRegisteredDialog<DialogDataType, ResultType>({
-    @required String dialogName,
-    DialogDataType data,
+  Future<ResultType?> showRegisteredDialog<DialogDataType, ResultType>({
+    required String dialogName,
+    required DialogDataType data,
     bool barrierDismissible = false,
   });
 
@@ -128,7 +128,7 @@ abstract class InteractionManager {
   /// If [barrierDismissible] is set to `true` a tap outside the dialog will pop it.
   Future showMessageDialog(
     String message, {
-    String title,
+    String? title,
     String closeButtonText = 'OK',
     bool barrierDismissible = false,
   });
@@ -140,7 +140,7 @@ abstract class InteractionManager {
   /// If [barrierDismissible] is set to `true` a tap outside the dialog will pop it.
   Future<MessageDialogResults> showQueryDialog(
     String message, {
-    String title,
+    String? title,
     Map<MessageDialogResults, String> buttonDefinitions = const {
       MessageDialogResults.yes: 'Yes',
       MessageDialogResults.no: 'No',
@@ -158,29 +158,29 @@ abstract class InteractionManager {
   /// If [barrierDismissible] is set to `true` a tap outside the dialog will pop it.
   /// Returned is a [UserCredential] object with the name and the password
   /// if the user has pressed the "Ok" button otherwise it returns `null`
-  Future<UserCredentials> showLoginDialog({
+  Future<UserCredentials?> showLoginDialog({
     String title = 'Login',
     String okButtonText = 'OK',
-    String cancelButtonText,
+    String? cancelButtonText,
     String usernameLabel = 'User name',
     String passwordLabel = 'Password',
-    String header,
-    String Function(String) usernameValidator,
-    String Function(String) passwordValidator,
+    String? header,
+    String? Function(String)? usernameValidator,
+    String? Function(String)? passwordValidator,
     bool barrierDismissible = false,
   });
 
-  Future<NetworkConfiguration> showNetworkConfigurationDialog({
+  Future<NetworkConfiguration?> showNetworkConfigurationDialog({
     String title = 'Connection Settings',
-    String message,
+    String? message,
     String serverAdressLabel = 'Server Address',
     String portLabel = 'Server Port',
     String sslLabel = 'Use SSL',
     bool showProtocolSelection = true,
     String portFormatErrorMessage = 'Only Numbers',
     String okButtonText = 'Ok',
-    String cancelButtonText,
-    NetworkConfiguration networkConfiguration = const NetworkConfiguration(),
+    String? cancelButtonText,
+    NetworkConfiguration networkConfiguration,
     bool barrierDismissible = false,
   });
 
@@ -194,16 +194,16 @@ class InteractionConnector extends StatefulWidget {
 
   /// Fire and forget async ApplicationInitFunction that will be called as soon as the
   /// Interaction Manager is ready
-  final FutureOr Function() appInitFunction;
+  final FutureOr Function()? appInitFunction;
 
   /// Will be called before [appInitFunction] pass here your funtion where you register your custom dialogs.
-  final void Function(InteractionManager) dialogsInitFunction;
+  final void Function(InteractionManager)? dialogsInitFunction;
 
   const InteractionConnector({
     this.dialogsInitFunction,
     this.appInitFunction,
-    this.child,
-    Key key,
+    required this.child,
+    Key? key,
   }) : super(key: key);
   @override
   InteractionConnectorState createState() => InteractionConnectorState();

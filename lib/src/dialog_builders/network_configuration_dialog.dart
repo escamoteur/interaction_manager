@@ -8,31 +8,32 @@ class NetworkConfiguration {
   final String serverAdress;
   final int port;
 
-  const NetworkConfiguration({this.useSSL, this.serverAdress, this.port});
+  const NetworkConfiguration(
+      {required this.useSSL, required this.serverAdress, required this.port});
 }
 
 class NetworkConfigurationDialogConfig {
-  final String title;
-  final String message;
+  final String? title;
+  final String? message;
   final String serverAdressLabel;
   final String portLabel;
-  final String sslLabel;
+  final String? sslLabel;
   final bool showProtocolSelection;
   final String portFormatErrorMessage;
   final String okButtonText;
-  final String cancelButtonText;
-  final NetworkConfiguration netWorkConfiguration;
+  final String? cancelButtonText;
+  final NetworkConfiguration? netWorkConfiguration;
 
   NetworkConfigurationDialogConfig({
-    this.portFormatErrorMessage,
-    this.okButtonText,
+    required this.portFormatErrorMessage,
+    required this.okButtonText,
     this.cancelButtonText,
     this.title,
     this.message,
-    this.serverAdressLabel,
-    this.portLabel,
+    required this.serverAdressLabel,
+    required this.portLabel,
     this.sslLabel,
-    this.showProtocolSelection,
+    required this.showProtocolSelection,
     this.netWorkConfiguration,
   });
 }
@@ -40,15 +41,15 @@ class NetworkConfigurationDialogConfig {
 class NetworkConfigurationDialog {
   static const String dialogId = 'NetWorkConfiguration';
   static Widget build(
-          BuildContext context, NetworkConfigurationDialogConfig config) =>
+          BuildContext context, NetworkConfigurationDialogConfig? config) =>
       NetWorkConfigurationWidget(
-        dialogConfig: config,
+        dialogConfig: config!,
       );
 }
 
 class NetWorkConfigurationWidget extends StatefulWidget {
   final NetworkConfigurationDialogConfig dialogConfig;
-  const NetWorkConfigurationWidget({Key key, this.dialogConfig})
+  const NetWorkConfigurationWidget({Key? key, required this.dialogConfig})
       : super(key: key);
 
   @override
@@ -58,19 +59,20 @@ class NetWorkConfigurationWidget extends StatefulWidget {
 
 class NetWorkConfigurationWidgetState
     extends State<NetWorkConfigurationWidget> {
-  TextEditingController ipController;
-  TextEditingController portController;
+  late TextEditingController ipController;
+  late TextEditingController portController;
 
-  String portErrorText;
-  int port;
-  String serverAddress;
-  bool useSSL;
+  String? portErrorText;
+  int? port;
+  late String serverAddress;
+  late bool? useSSL;
 
   @override
   void initState() {
-    serverAddress = widget.dialogConfig.netWorkConfiguration.serverAdress ?? '';
-    port = widget.dialogConfig.netWorkConfiguration.port;
-    useSSL = widget.dialogConfig.netWorkConfiguration.useSSL ?? false;
+    serverAddress =
+        widget.dialogConfig.netWorkConfiguration?.serverAdress ?? '';
+    port = widget.dialogConfig.netWorkConfiguration?.port;
+    useSSL = widget.dialogConfig.netWorkConfiguration?.useSSL ?? false;
     ipController = TextEditingController(text: serverAddress);
     portController = TextEditingController(text: port?.toString() ?? '');
     super.initState();
@@ -87,7 +89,7 @@ class NetWorkConfigurationWidgetState
           if (dlgConfig.message != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 24),
-              child: Text(dlgConfig.message),
+              child: Text(dlgConfig.message!),
             ),
           Text(dlgConfig.serverAdressLabel),
           TextField(
@@ -119,10 +121,10 @@ class NetWorkConfigurationWidgetState
               padding: const EdgeInsets.only(top: 8),
               child: Row(
                 children: [
-                  Text(dlgConfig.sslLabel),
+                  Text(dlgConfig.sslLabel!),
                   Checkbox(
                     value: useSSL,
-                    onChanged: (b) => setState(() =>useSSL = b),
+                    onChanged: (b) => setState(() => useSSL = b),
                   ),
                 ],
               ),
@@ -140,14 +142,14 @@ class NetWorkConfigurationWidgetState
               onPressed: () {
                 Navigator.of(context).pop(null);
               },
-              child: Text(dlgConfig.cancelButtonText),
+              child: Text(dlgConfig.cancelButtonText!),
             ),
           FlatButton(
             onPressed: () {
               final netWorkConfig = NetworkConfiguration(
-                  port: port,
+                  port: port!,
                   serverAdress: serverAddress.trim(),
-                  useSSL: useSSL);
+                  useSSL: useSSL!);
 
               Navigator.of(context).pop(netWorkConfig);
             },
@@ -165,14 +167,14 @@ class NetWorkConfigurationWidgetState
               onPressed: () {
                 Navigator.of(context).pop(null);
               },
-              child: Text(dlgConfig.cancelButtonText),
+              child: Text(dlgConfig.cancelButtonText!),
             ),
           FlatButton(
             onPressed: () {
               final netWorkConfig = NetworkConfiguration(
-                  port: port,
+                  port: port ?? -1,
                   serverAdress: serverAddress.trim(),
-                  useSSL: useSSL);
+                  useSSL: useSSL!);
 
               Navigator.of(context).pop(netWorkConfig);
             },

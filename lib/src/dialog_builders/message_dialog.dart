@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:interaction_manager/src/interaction_manager.dart';
 
 class MessageDialogConfig {
-  final String title;
-  final String message;
+  final String? title;
+  final String? message;
   final Map<MessageDialogResults, String> buttonDefinitions;
 
-  MessageDialogConfig({this.title, this.message, this.buttonDefinitions});
+  MessageDialogConfig(
+      {this.title, this.message, required this.buttonDefinitions});
 }
 
 class MessageDialog {

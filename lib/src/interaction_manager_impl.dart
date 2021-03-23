@@ -11,13 +11,11 @@ import 'package:interaction_manager/src/dialog_builders/network_configuration_di
 export 'package:interaction_manager/src/dialog_builders/message_dialog.dart';
 export 'package:interaction_manager/src/dialog_builders/network_configuration_dialog.dart';
 
-typedef DialogBuilderFunc<T> = Widget Function(BuildContext, T);
-
 class InteractionManagerImplementation implements InteractionManager {
-  NavigatorState _rootNavigatorState;
+  late NavigatorState _rootNavigatorState;
   int _numOpenDialogs = 0;
   Map<String, _DialogRegistration<Object>> _dialogRegistry =
-      <String, _DialogRegistration>{};
+      <String, _DialogRegistration<Object>>{};
 
   @override
   bool allowReassigningDialogs = false;
@@ -27,8 +25,8 @@ class InteractionManagerImplementation implements InteractionManager {
       _rootNavigatorState = navigatorState;
 
   @override
-  Future<T> navigateTo<T>(String routeName, {Object arguments}) {
-    BuildContext childContext;
+  Future<T?> navigateTo<T>(String routeName, {Object? arguments}) {
+    late BuildContext childContext;
     _rootNavigatorState.context
         .visitChildElements((element) => childContext = element);
 
@@ -37,9 +35,9 @@ class InteractionManagerImplementation implements InteractionManager {
   }
 
   @override
-  void closeDialog<TResult>([TResult result]) {
+  void closeDialog<TResult>([TResult? result]) {
     if (_numOpenDialogs > 0) {
-      BuildContext childContext;
+      late BuildContext childContext;
       _rootNavigatorState.context
           .visitChildElements((element) => childContext = element);
 
@@ -47,13 +45,13 @@ class InteractionManagerImplementation implements InteractionManager {
     }
   }
 
-  Future<ResultType> _showCustomDialog<DialogDataType, ResultType>(
-      {DialogBuilderFunc<DialogDataType> dialogBuilder,
-      DialogDataType data,
+  Future<ResultType?> _showCustomDialog<DialogDataType, ResultType>(
+      {required DialogBuilderFunc<DialogDataType> dialogBuilder,
+      required DialogDataType data,
       bool barrierDismissible = false}) async {
-    ResultType result;
+    ResultType? result;
     _numOpenDialogs++;
-    BuildContext childContext;
+    late BuildContext childContext;
     _rootNavigatorState.context
         .visitChildElements((element) => childContext = element);
 
@@ -86,13 +84,14 @@ class InteractionManagerImplementation implements InteractionManager {
       throw (StateError(
           'There is already a dialog with name: "$dialogName" registered'));
     }
-    _dialogRegistry[dialogName] = _DialogRegistration<DialogDataType>(builder);
+    _dialogRegistry[dialogName] = _DialogRegistration<DialogDataType>(builder)
+        as _DialogRegistration<Object>;
   }
 
   @override
-  Future<ResultType> showRegisteredDialog<DialogDataType, ResultType>(
-      {String dialogName,
-      DialogDataType data,
+  Future<ResultType?> showRegisteredDialog<DialogDataType, ResultType>(
+      {required String dialogName,
+      required DialogDataType data,
       bool barrierDismissible = false}) {
     if (!_dialogRegistry.containsKey(dialogName)) {
       throw (StateError(
@@ -110,7 +109,7 @@ class InteractionManagerImplementation implements InteractionManager {
   @override
   Future showMessageDialog(
     String message, {
-    String title,
+    String? title,
     String closeButtonText = 'OK',
     bool barrierDismissible = false,
   }) async {
@@ -124,16 +123,16 @@ class InteractionManagerImplementation implements InteractionManager {
   }
 
   @override
-  Future<UserCredentials> showLoginDialog({
+  Future<UserCredentials?> showLoginDialog({
     String title = 'Login',
     String okButtonText = 'OK',
-    String cancelButtonText,
+    String? cancelButtonText,
     String usernameLabel = 'User name',
     String passwordLabel = 'Password',
-    String header,
-    String userNamePrefill,
-    String Function(String) usernameValidator,
-    String Function(String) passwordValidator,
+    String? header,
+    String? userNamePrefill,
+    String? Function(String)? usernameValidator,
+    String? Function(String)? passwordValidator,
     bool barrierDismissible = false,
   }) async {
     return await showRegisteredDialog<LoginDialogConfig, UserCredentials>(
@@ -156,35 +155,35 @@ class InteractionManagerImplementation implements InteractionManager {
   @override
   Future<MessageDialogResults> showQueryDialog(
     String message, {
-    String title,
+    String? title,
     Map<MessageDialogResults, String> buttonDefinitions = const {
       MessageDialogResults.yes: 'Yes',
       MessageDialogResults.no: 'No',
     },
     bool barrierDismissible = false,
   }) async {
-    return await showRegisteredDialog<MessageDialogConfig,
+    return (await showRegisteredDialog<MessageDialogConfig,
             MessageDialogResults>(
         dialogName: MessageDialog.dialogId,
         data: MessageDialogConfig(
             message: message,
             title: title,
             buttonDefinitions: buttonDefinitions),
-        barrierDismissible: barrierDismissible);
+        barrierDismissible: barrierDismissible))!;
   }
 
   @override
-  Future<NetworkConfiguration> showNetworkConfigurationDialog({
+  Future<NetworkConfiguration?> showNetworkConfigurationDialog({
     String title = 'Connection Settings',
-    String message,
+    String? message,
     String serverAdressLabel = 'Server Address',
     String portLabel = 'Server Port',
     String sslLabel = 'Use SSL',
     bool showProtocolSelection = true,
     String portFormatErrorMessage = 'Only Numbers',
     String okButtonText = 'Ok',
-    String cancelButtonText,
-    NetworkConfiguration networkConfiguration = const NetworkConfiguration(),
+    String? cancelButtonText,
+    NetworkConfiguration? networkConfiguration,
     bool barrierDismissible = false,
   }) async {
     return await showRegisteredDialog<NetworkConfigurationDialogConfig,

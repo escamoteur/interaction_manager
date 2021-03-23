@@ -8,26 +8,26 @@ class UserCredentials {
   final String userName;
   final String password;
 
-  const UserCredentials({this.userName, this.password});
+  const UserCredentials({required this.userName, required this.password});
 }
 
 class LoginDialogConfig {
-  final String title;
-  final String message;
-  final String userNamePrefill;
+  final String? title;
+  final String? message;
+  final String? userNamePrefill;
   final String userNameLabel;
   final String passwordLabel;
   final String okButtonText;
-  final String cancelButtonText;
-  final String Function(String password) usernameValidator;
-  final String Function(String password) passwordValidator;
+  final String? cancelButtonText;
+  final String? Function(String password)? usernameValidator;
+  final String? Function(String password)? passwordValidator;
 
   LoginDialogConfig({
     this.title,
     this.message,
-    this.userNameLabel,
-    this.passwordLabel,
-    this.okButtonText,
+    required this.userNameLabel,
+    required this.passwordLabel,
+    required this.okButtonText,
     this.cancelButtonText,
     this.userNamePrefill,
     this.usernameValidator,
@@ -37,23 +37,23 @@ class LoginDialogConfig {
 
 class LoginDialog {
   static const String dialogId = 'Login';
-  static Widget build(BuildContext context, LoginDialogConfig config) =>
+  static Widget build(BuildContext context, LoginDialogConfig? config) =>
       LoginWidget(
-        dialogConfig: config,
+        dialogConfig: config!,
       );
 }
 
 class LoginWidget extends StatefulWidget {
   final LoginDialogConfig dialogConfig;
-  const LoginWidget({Key key, this.dialogConfig}) : super(key: key);
+  const LoginWidget({Key? key, required this.dialogConfig}) : super(key: key);
 
   @override
   LoginWidgetState createState() => LoginWidgetState();
 }
 
 class LoginWidgetState extends State<LoginWidget> {
-  TextEditingController userNameController;
-  TextEditingController passwordController;
+  late TextEditingController userNameController;
+  late TextEditingController passwordController;
 
   @override
   void initState() {
@@ -63,8 +63,8 @@ class LoginWidgetState extends State<LoginWidget> {
     super.initState();
   }
 
-  String passwordErrorText;
-  String userNameErrorText;
+  String? passwordErrorText;
+  String? userNameErrorText;
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,7 @@ class LoginWidgetState extends State<LoginWidget> {
           if (dlgConfig.message != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 24),
-              child: Text(dlgConfig.message),
+              child: Text(dlgConfig.message!),
             ),
           Text(dlgConfig.userNameLabel),
           PlatformTextField(
@@ -127,7 +127,7 @@ class LoginWidgetState extends State<LoginWidget> {
               onPressed: () {
                 Navigator.of(context).pop(null);
               },
-              child: Text(dlgConfig.cancelButtonText),
+              child: Text(dlgConfig.cancelButtonText!),
             ),
           FlatButton(
             onPressed: onOk,
@@ -145,7 +145,7 @@ class LoginWidgetState extends State<LoginWidget> {
               onPressed: () {
                 Navigator.of(context).pop(null);
               },
-              child: Text(dlgConfig.cancelButtonText),
+              child: Text(dlgConfig.cancelButtonText!),
             ),
           FlatButton(
             onPressed: onOk,

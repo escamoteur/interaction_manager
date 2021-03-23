@@ -7,14 +7,14 @@ void registerDialogs(InteractionManager ia) {
 
 Widget buildTestDialog(BuildContext context, Map<String, String> data) =>
     AlertDialog(
-      title: Text(data['title']),
-      content: Text(data['message']),
+      title: Text(data['title']!),
+      content: Text(data['message']!),
       actions: [
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text(data['buttonText']),
+          child: Text(data['buttonText']!),
         ),
       ],
     );

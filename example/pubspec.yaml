@@ -14,12 +14,12 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   interaction_manager:
-    path: ..
-  get_it: ^5.0.0  
+    path: ../
+  get_it: ^6.0.0  
   flutter:
     sdk: flutter
 
