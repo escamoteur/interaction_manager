@@ -123,13 +123,13 @@ class LoginWidgetState extends State<LoginWidget> {
         content: content,
         actions: <Widget>[
           if (dlgConfig.cancelButtonText != null)
-            FlatButton(
+            MaterialButton(
               onPressed: () {
                 Navigator.of(context).pop(null);
               },
               child: Text(dlgConfig.cancelButtonText!),
             ),
-          FlatButton(
+          MaterialButton(
             onPressed: onOk,
             child: Text(dlgConfig.okButtonText),
           ),
@@ -141,13 +141,13 @@ class LoginWidgetState extends State<LoginWidget> {
         content: content,
         actions: <Widget>[
           if (dlgConfig.cancelButtonText != null)
-            FlatButton(
+            MaterialButton(
               onPressed: () {
                 Navigator.of(context).pop(null);
               },
               child: Text(dlgConfig.cancelButtonText!),
             ),
-          FlatButton(
+          MaterialButton(
             onPressed: onOk,
             child: Text(dlgConfig.okButtonText),
           ),

@@ -138,13 +138,13 @@ class NetWorkConfigurationWidgetState
         content: content,
         actions: <Widget>[
           if (dlgConfig.cancelButtonText != null)
-            FlatButton(
+            MaterialButton(
               onPressed: () {
                 Navigator.of(context).pop(null);
               },
               child: Text(dlgConfig.cancelButtonText!),
             ),
-          FlatButton(
+          MaterialButton(
             onPressed: () {
               final netWorkConfig = NetworkConfiguration(
                   port: port!,
@@ -163,13 +163,13 @@ class NetWorkConfigurationWidgetState
         content: content,
         actions: <Widget>[
           if (dlgConfig.cancelButtonText != null)
-            FlatButton(
+            MaterialButton(
               onPressed: () {
                 Navigator.of(context).pop(null);
               },
               child: Text(dlgConfig.cancelButtonText!),
             ),
-          FlatButton(
+          MaterialButton(
             onPressed: () {
               final netWorkConfig = NetworkConfiguration(
                   port: port ?? -1,

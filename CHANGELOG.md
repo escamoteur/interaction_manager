@@ -1,3 +1,7 @@
+## [0.7.0] - 19.10.2022
+
+* null safety version. Without docs so far
+
 ## [0.6.0] - 23.03.2021
 
 * null safety version. Without docs so far

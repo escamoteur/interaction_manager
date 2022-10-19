@@ -34,13 +34,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('InteractionManager'),
+        title: const Text('InteractionManager'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            RaisedButton(
+            MaterialButton(
               onPressed: () async {
                 await GetIt.I<InteractionManager>()
                     .showRegisteredDialog<Map<String, String>, void>(
@@ -52,22 +52,22 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 );
               },
-              child: Text(
+              child: const Text(
                 'Registered CustomDialog:',
               ),
             ),
-            RaisedButton(
+            MaterialButton(
               onPressed: () async {
                 await GetIt.I<InteractionManager>().showMessageDialog(
                     'This is a message!',
                     title: 'Message Dialog',
                     closeButtonText: 'OK');
               },
-              child: Text(
+              child: const Text(
                 'Message Dialog:',
               ),
             ),
-            RaisedButton(
+            MaterialButton(
               onPressed: () async {
                 MessageDialogResults result =
                     await GetIt.I<InteractionManager>().showQueryDialog(
@@ -76,11 +76,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
                 print(result);
               },
-              child: Text(
+              child: const Text(
                 'Query Dialog:',
               ),
             ),
-            RaisedButton(
+            MaterialButton(
               onPressed: () async {
                 await GetIt.I<InteractionManager>()
                     .showNetworkConfigurationDialog(
@@ -89,11 +89,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   okButtonText: 'OK',
                 );
               },
-              child: Text(
+              child: const Text(
                 'Network Dialog:',
               ),
             ),
-            RaisedButton(
+            MaterialButton(
               onPressed: () async {
                 await GetIt.I<InteractionManager>().showLoginDialog(
                     okButtonText: 'OK',
@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       return s.isEmpty ? 'You have to provide a name' : null;
                     });
               },
-              child: Text(
+              child: const Text(
                 'Login Dialog:',
               ),
             ),

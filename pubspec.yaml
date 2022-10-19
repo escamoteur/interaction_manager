@@ -1,6 +1,6 @@
 name: interaction_manager
-description: A new Flutter package project.
-version: 0.6.0
+description: package that allows display of dialogs from non UI code
+version: 0.7.0
 author:
 homepage: https://github.com/escamoteur/interaction_manager
 
@@ -10,7 +10,7 @@ environment:
 dependencies:
   get_it: ^6.0.0
   lint: ^1.5.3
-  flutter_platform_widgets: ^1.0.0 
+  flutter_platform_widgets: ^2.0.0  
   flutter:
     sdk: flutter
 

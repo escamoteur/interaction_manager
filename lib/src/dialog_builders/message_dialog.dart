@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_classes_with_only_static_members
+
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -31,7 +33,7 @@ class MessageDialog {
               actions: [
                 for (final buttonDefinition
                     in dialogConfig.buttonDefinitions.entries)
-                  FlatButton(
+                  MaterialButton(
                     onPressed: () {
                       Navigator.of(context)
                           .pop<MessageDialogResults>(buttonDefinition.key);
@@ -46,7 +48,7 @@ class MessageDialog {
               actions: [
                 for (final buttonDefinition
                     in dialogConfig.buttonDefinitions.entries)
-                  FlatButton(
+                  MaterialButton(
                     onPressed: () {
                       Navigator.of(context)
                           .pop<MessageDialogResults>(buttonDefinition.key);
